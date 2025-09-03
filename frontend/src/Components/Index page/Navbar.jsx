@@ -1,0 +1,47 @@
+function Navbar({ user, onLogout, onGetStarted }){  
+    return(
+  <nav className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">MB</span>
+                  </div>
+                  <span className="text-xl font-bold text-gray-900">Mongo Buddy</span>
+                </div>
+              </div>
+            </div>
+            <div className="hidden md:flex items-center space-x-8">
+              <a href="#" className="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium">Home</a>
+              <a href="#" className="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium">Modules</a>
+              <a href="#" className="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium">Leaderboard</a>
+              
+              {user ? (
+                <div className="flex items-center space-x-4">
+                  <span className="text-gray-700 text-sm">
+                    Welcome, <span className="font-medium">{user.name}</span>!
+                  </span>
+                  <button 
+                    onClick={onLogout}
+                    className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors text-sm"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <button 
+                  onClick={onGetStarted}
+                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  Get Started
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </nav>
+    )
+}
+export default Navbar
