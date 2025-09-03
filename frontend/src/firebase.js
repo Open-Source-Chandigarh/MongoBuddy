@@ -4,13 +4,13 @@ import { initializeApp } from 'firebase/app';
 // TODO: Add your Firebase configuration
 // You'll need to replace this with your actual Firebase config from the Firebase Console
 const firebaseConfig = {
-  apiKey: "AIzaSyCZrhvPxHObHQX7fo8gxIluR74xtTA8ChY",
-  authDomain: "mongobuddy-d5dc8.firebaseapp.com",
-  projectId: "mongobuddy-d5dc8",
-  storageBucket: "mongobuddy-d5dc8.firebasestorage.app",
-  messagingSenderId: "69172953843",
-  appId: "1:69172953843:web:be8c57d577d4cdf72ead86",
-  measurementId: "G-9LGHR1PK78"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase
