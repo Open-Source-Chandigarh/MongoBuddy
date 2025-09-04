@@ -8,6 +8,8 @@ import step4one from '../../assets/pics/step4-1.png';
 import step4two from '../../assets/pics/step4-2.png';
 import step4three from '../../assets/pics/step4-3.png';
 import step4four from '../../assets/pics/step4-4.png';
+import step4five from '../../assets/pics/step4-5.png';
+import step4six from '../../assets/pics/step4-6.png';
 
 const Module4 = ({ onBackToPath, onModuleComplete }) => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -84,11 +86,21 @@ const Module4 = ({ onBackToPath, onModuleComplete }) => {
         },
         {
           type: "text",
-          content: "Simple findOne() command gives the first document of the collection if we don't specify a condition."
+          content: "Inclusion projection- When we want only few columns to be displayed"
         },
+        {
+          type: "image",
+          src: step4five,
+          alt: "MongoDB shell showing find all results"
+        },
+        {
+          type: "text",
+          content: "Exclusion projection- When we want only few columns to be hidden"
+        },
+        
       ],
 
-      screenshot: step1,
+      screenshot: step4six,
       screenshotAlt: "MongoDB shell showing various find operations and results"
     },
     {
