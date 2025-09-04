@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import BearMascot from './BearMascot';
 
-const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartTask1, completedModules }) => {
+const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartTask1, onStartTask2, onStartInstallation, completedModules }) => {
   const [completedCheckpoints, setCompletedCheckpoints] = useState(completedModules?.map(m => m.id) || []);
   const [currentCheckpoint, setCurrentCheckpoint] = useState(() => {
     // If no modules completed, start with checkpoint 0
@@ -71,6 +71,22 @@ const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartT
     },
     {
       id: 4,
+      title: "Task 2",
+      description: "Practice CRUD operations",
+      type: "task",
+      questions: 0,
+      xp: 80
+    },
+    {
+      id: 5,
+      title: "Installation Guide",
+      description: "Install MongoDB Compass & Shell",
+      type: "installation",
+      questions: 0,
+      xp: 50
+    },
+    {
+      id: 6,
       title: "Queries & Filters",
       description: "Finding and filtering data",
       type: "checkpoint",
@@ -78,7 +94,7 @@ const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartT
       xp: 85
     },
     {
-      id: 5,
+      id: 7,
       title: "Indexing",
       description: "Optimizing query performance",
       type: "checkpoint",
@@ -86,7 +102,7 @@ const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartT
       xp: 90
     },
     {
-      id: 6,
+      id: 8,
       title: "Aggregation Pipeline",
       description: "Advanced data processing",
       type: "checkpoint",
@@ -94,7 +110,7 @@ const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartT
       xp: 120
     },
     {
-      id: 7,
+      id: 9,
       title: "MongoDB Expert",
       description: "Complete your MongoDB journey!",
       type: "end",
@@ -104,7 +120,7 @@ const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartT
   ];
 
   const handleCheckpointClick = (checkpointId) => {
-    if (checkpointId <= currentCheckpoint) {
+   // if (checkpointId <= currentCheckpoint) {
       // Allow access to current and completed checkpoints
       console.log(`Starting checkpoint: ${checkpoints[checkpointId].title}`);
       
@@ -117,16 +133,20 @@ const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartT
         onStartTask1();
       } else if (checkpointId === 3) {
         onStartModule3();
+      } else if (checkpointId === 4) {
+        onStartTask2();
+      } else if (checkpointId === 5) {
+        onStartInstallation();
       }
       // Add more module navigation here for other checkpoints
-    }
+    //}
   };
 
   const getCheckpointStatus = (checkpointId) => {
     if (completedCheckpoints.includes(checkpointId)) return 'completed';
     if (checkpointId === currentCheckpoint) return 'current';
     if (checkpointId < currentCheckpoint) return 'available';
-    return 'locked';
+    return 'available ';
   };
 
   const getCheckpointColor = (checkpoint) => {
@@ -135,6 +155,7 @@ const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartT
     if (checkpoint.type === 'start') return 'bg-green-500';
     if (checkpoint.type === 'end') return 'bg-red-500';
     if (checkpoint.type === 'task') return 'bg-purple-500';
+    if (checkpoint.type === 'installation') return 'bg-blue-500';
     
     switch (status) {
       case 'completed': return 'bg-yellow-500';
@@ -260,6 +281,24 @@ const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartT
                         )}
                       </div>
                     )}
+
+                    {checkpoint.type === 'installation' && (
+                      <div className="text-center text-white relative">
+                        {getCheckpointStatus(checkpoint.id) === 'locked' ? (
+                          <div className="text-3xl">🔒</div>
+                        ) : (
+                          <div className="relative flex items-center justify-center">
+                            <div className="text-4xl">⚙️</div>
+                            <div className="absolute -bottom-2 -right-2 text-2xl">📦</div>
+                            {getCheckpointStatus(checkpoint.id) === 'completed' && (
+                              <div className="absolute -top-1 -right-1 bg-green-500 rounded-full w-6 h-6 flex items-center justify-center text-sm">
+                                ✓
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
                     
                     {/* Bear Mascot only for task checkpoints - removed from other checkpoints */}
                   </button>
@@ -287,6 +326,13 @@ const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartT
                     {checkpoint.type === 'task' && (
                       <div className="flex justify-between text-xs text-gray-500">
                         <span>📋 Practice Task</span>
+                        <span>⭐ {checkpoint.xp} XP</span>
+                      </div>
+                    )}
+
+                    {checkpoint.type === 'installation' && (
+                      <div className="flex justify-between text-xs text-gray-500">
+                        <span>📦 Installation Guide</span>
                         <span>⭐ {checkpoint.xp} XP</span>
                       </div>
                     )}
