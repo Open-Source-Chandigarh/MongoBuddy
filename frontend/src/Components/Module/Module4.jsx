@@ -10,6 +10,7 @@ import step4three from '../../assets/pics/step4-3.png';
 import step4four from '../../assets/pics/step4-4.png';
 import step4five from '../../assets/pics/step4-5.png';
 import step4six from '../../assets/pics/step4-6.png';
+import step5 from '../../assets/pics/step5.png'
 
 const Module4 = ({ onBackToPath, onModuleComplete }) => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -107,9 +108,13 @@ const Module4 = ({ onBackToPath, onModuleComplete }) => {
       id: 5,
       title: "Query Operators",
       description: "Learn advanced query operators for complex filtering",
-      content: "MongoDB provides many operators for complex queries including comparison, logical, and array operators.",
+      content: ["MongoDB provides many operators for complex queries including comparison, logical, and array operators.",
+        "Comparison: $eq (equal), $ne (not equal), $gte (greater than or equal), $lt (less than), $lte (less than or equal) ",
+        "Logical Operators: $and , $or, $not , $nor",
+        "For example- AND → students age > 22 AND gpa > 3.5"
+      ],
     
-      screenshot: "/screenshots/mongosh-operators.png",
+      screenshot: step5,
       screenshotAlt: "MongoDB shell showing query operators in action"
     },
     {
@@ -162,7 +167,7 @@ db.students.findOneAndDelete({ age: { $lt: 18 } })`,
       screenshot: "/screenshots/mongosh-delete.png",
       screenshotAlt: "MongoDB shell showing delete operations and confirmations"
     },
-    {
+/*    {
       id: 8,
       title: "Working with Indexes",
       description: "Learn how to create and manage indexes for better performance",
@@ -235,7 +240,7 @@ db.createCollection("logs", { capped: true, size: 100000, max: 100 })
 db.students.find({ $text: { $search: "Computer Science" } })`,
       screenshot: "/screenshots/mongosh-advanced.png",
       screenshotAlt: "MongoDB shell showing advanced operations and administrative commands"
-    }
+    } */
   ];
 
   const totalSteps = shellSteps.length;
