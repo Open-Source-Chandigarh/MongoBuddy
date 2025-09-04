@@ -94,15 +94,7 @@ const Login = ({ onLoginSuccess, onBackToHome, onSwitchToSignup }) => {
     }
   };
 
-  // Temporary direct access for development
-  const handleDirectAccess = () => {
-    const tempUser = {
-      name: 'Demo User',
-      email: 'demo@example.com',
-      loginDate: new Date().toISOString()
-    };
-    onLoginSuccess(tempUser);
-  };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -184,15 +176,6 @@ const Login = ({ onLoginSuccess, onBackToHome, onSwitchToSignup }) => {
               )}
             </button>
           </div>
-
-          {/* Demo Access for Development */}
-          <button
-            type="button"
-            onClick={handleDirectAccess}
-            className="group relative w-full flex justify-center py-3 px-4 border border-green-600 text-sm font-medium rounded-md text-green-600 bg-white hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
-          >
-            🎯 Demo Access (Development Only)
-          </button>
 
           {/* Signup Link */}
           <div className="text-center">
