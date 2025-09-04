@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import BearMascot from '../BearMascot';
+import pic1 from "../../assets/pics/pic1.png";
+import pic2 from "../../assets/pics/pic2.png";
+import pic3 from "../../assets/pics/pic3.png"
+import pic4 from "../../assets/pics/image.png";
 
 const Installation = ({ onBackToPath, onModuleComplete }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [completedSteps, setCompletedSteps] = useState([]);
-  const [selectedOS, setSelectedOS] = useState('windows');
 
   const markStepCompleted = (stepNumber) => {
     if (!completedSteps.includes(stepNumber)) {
@@ -18,205 +21,72 @@ const Installation = ({ onBackToPath, onModuleComplete }) => {
   };
 
   const installationSteps = {
-    windows: {
-      compass: [
-        {
-          title: "Download MongoDB Compass",
-          content: "Go to the official MongoDB website at mongodb.com/try/download/compass",
-          code: "https://www.mongodb.com/try/download/compass",
-          image: "🌐",
-          screenshot: "/screenshots/compass-download-page.png",
-          screenshotAlt: "MongoDB Compass download page showing Windows download options"
-        },
-        {
-          title: "Select Windows Version",
-          content: "Choose the Windows installer (.exe) appropriate for your system (64-bit recommended)",
-          code: "mongodb-compass-1.40.4-win32-x64.exe",
-          image: "💻",
-          screenshot: "/screenshots/compass-version-selection.png",
-          screenshotAlt: "MongoDB Compass version selection page highlighting Windows 64-bit installer"
-        },
-        {
-          title: "Run the Installer",
-          content: "Double-click the downloaded .exe file and follow the installation wizard",
-          code: "Right-click → 'Run as administrator' (recommended)",
-          image: "⚙️",
-          screenshot: "/screenshots/compass-installer-wizard.png",
-          screenshotAlt: "MongoDB Compass installation wizard welcome screen"
-        },
-        {
-          title: "Launch MongoDB Compass",
-          content: "Find MongoDB Compass in your Start menu or desktop and launch it",
-          code: "Start → MongoDB Compass",
-          image: "🚀",
-          screenshot: "/screenshots/compass-first-launch.png",
-          screenshotAlt: "MongoDB Compass welcome screen after first launch"
-        }
-      ],
-      shell: [
-        {
-          title: "Download MongoDB Community Server",
-          content: "Visit mongodb.com/try/download/community and select Windows",
-          code: "https://www.mongodb.com/try/download/community",
-          image: "📦",
-          screenshot: "/screenshots/mongodb-community-download.png",
-          screenshotAlt: "MongoDB Community Server download page with Windows option selected"
-        },
-        {
-          title: "Install MongoDB Server",
-          content: "Run the .msi installer and choose 'Complete' installation",
-          code: "mongodb-windows-x86_64-7.0.4.msi",
-          image: "🔧",
-          screenshot: "/screenshots/mongodb-server-installation.png",
-          screenshotAlt: "MongoDB Server installation wizard showing Complete installation option"
-        },
-        {
-          title: "Add to System PATH",
-          content: "Add MongoDB bin directory to your system PATH environment variable",
-          code: "C:\\Program Files\\MongoDB\\Server\\7.0\\bin",
-          image: "🛤️",
-          screenshot: "/screenshots/windows-path-environment.png",
-          screenshotAlt: "Windows Environment Variables dialog showing PATH configuration"
-        },
-        {
-          title: "Verify Installation",
-          content: "Open Command Prompt and test the MongoDB shell",
-          code: "mongosh --version",
-          image: "✅",
-          screenshot: "/screenshots/mongosh-version-output.png",
-          screenshotAlt: "Command Prompt showing mongosh version output confirming successful installation"
-        }
-      ]
-    },
-    mac: {
-      compass: [
-        {
-          title: "Download MongoDB Compass",
-          content: "Go to mongodb.com/try/download/compass and select macOS",
-          code: "https://www.mongodb.com/try/download/compass",
-          image: "🍎",
-          screenshot: "/screenshots/compass-macos-download.png",
-          screenshotAlt: "MongoDB Compass download page with macOS option selected"
-        },
-        {
-          title: "Install the Application",
-          content: "Open the downloaded .dmg file and drag MongoDB Compass to Applications",
-          code: "Drag to /Applications folder",
-          image: "📱",
-          screenshot: "/screenshots/macos-dmg-install.png",
-          screenshotAlt: "macOS DMG installer window showing drag-to-Applications installation"
-        },
-        {
-          title: "Launch Compass",
-          content: "Open Applications folder and double-click MongoDB Compass",
-          code: "Applications → MongoDB Compass",
-          image: "🚀",
-          screenshot: "/screenshots/macos-applications-folder.png",
-          screenshotAlt: "macOS Applications folder showing MongoDB Compass icon"
-        }
-      ],
-      shell: [
-        {
-          title: "Install via Homebrew",
-          content: "Use Homebrew package manager to install MongoDB",
-          code: "brew tap mongodb/brew\nbrew install mongodb-community",
-          image: "🍺",
-          screenshot: "/screenshots/macos-homebrew-install.png",
-          screenshotAlt: "Terminal showing Homebrew MongoDB installation commands and output"
-        },
-        {
-          title: "Start MongoDB Service",
-          content: "Start the MongoDB service using brew services",
-          code: "brew services start mongodb/brew/mongodb-community",
-          image: "▶️",
-          screenshot: "/screenshots/macos-mongodb-service-start.png",
-          screenshotAlt: "Terminal showing MongoDB service start command and success message"
-        },
-        {
-          title: "Install MongoDB Shell",
-          content: "Install the MongoDB Shell (mongosh) separately",
-          code: "brew install mongosh",
-          image: "🐚",
-          screenshot: "/screenshots/macos-mongosh-install.png",
-          screenshotAlt: "Terminal showing mongosh installation via Homebrew"
-        },
-        {
-          title: "Verify Installation",
-          content: "Test the MongoDB shell connection",
-          code: "mongosh",
-          image: "✅",
-          screenshot: "/screenshots/macos-mongosh-connect.png",
-          screenshotAlt: "Terminal showing successful mongosh connection to MongoDB"
-        }
-      ]
-    },
-    linux: {
-      compass: [
-        {
-          title: "Download MongoDB Compass",
-          content: "Download the .deb or .rpm package for your Linux distribution",
-          code: "https://www.mongodb.com/try/download/compass",
-          image: "🐧",
-          screenshot: "/screenshots/compass-linux-download.png",
-          screenshotAlt: "MongoDB Compass download page showing Linux package options"
-        },
-        {
-          title: "Install Package",
-          content: "Install using your package manager",
-          code: "sudo dpkg -i mongodb-compass_*.deb\n# or\nsudo rpm -i mongodb-compass-*.rpm",
-          image: "📦",
-          screenshot: "/screenshots/linux-package-install.png",
-          screenshotAlt: "Terminal showing MongoDB Compass package installation on Linux"
-        },
-        {
-          title: "Launch Compass",
-          content: "Start MongoDB Compass from applications menu or terminal",
-          code: "mongodb-compass",
-          image: "🚀",
-          screenshot: "/screenshots/linux-compass-launch.png",
-          screenshotAlt: "Linux desktop showing MongoDB Compass in applications menu"
-        }
-      ],
-      shell: [
-        {
-          title: "Import MongoDB GPG Key",
-          content: "Add MongoDB's official GPG key to your system",
-          code: "wget -qO - https://www.mongodb.org/static/pgp/server-7.0.asc | sudo apt-key add -",
-          image: "🔑",
-          screenshot: "/screenshots/linux-gpg-key-import.png",
-          screenshotAlt: "Terminal showing GPG key import command and OK response"
-        },
-        {
-          title: "Add MongoDB Repository",
-          content: "Add MongoDB repository to your package sources",
-          code: "echo \"deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse\" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list",
-          image: "📋",
-          screenshot: "/screenshots/linux-repo-add.png",
-          screenshotAlt: "Terminal showing MongoDB repository addition to sources list"
-        },
-        {
-          title: "Install MongoDB",
-          content: "Update package database and install MongoDB",
-          code: "sudo apt-get update\nsudo apt-get install -y mongodb-org",
-          image: "⬇️",
-          screenshot: "/screenshots/linux-mongodb-install.png",
-          screenshotAlt: "Terminal showing MongoDB package installation progress"
-        },
-        {
-          title: "Start MongoDB Service",
-          content: "Start and enable MongoDB service",
-          code: "sudo systemctl start mongod\nsudo systemctl enable mongod",
-          image: "▶️",
-          screenshot: "/screenshots/linux-service-start.png",
-          screenshotAlt: "Terminal showing MongoDB service start and enable commands"
-        }
-      ]
-    }
+    compass: [
+      {
+        title: "Download MongoDB Compass",
+        content: "Go to the official MongoDB website at https://www.mongodb.com/try/download/community",
+        code: "https://www.mongodb.com/try/download/compass",
+        image: "🌐",
+        screenshot: pic1,
+        screenshotAlt: "MongoDB Compass download page showing Windows download options"
+      },
+      
+      {
+        title: "Select Windows Version",
+        content: "Choose the Windows installer appropriate for your system (64-bit recommended)",
+        code: "mongodb-compass-1.40.4-win32-x64.exe",
+        image: "💻",
+        screenshot: pic2,
+        screenshotAlt: "MongoDB Compass version selection page highlighting Windows 64-bit installer"
+      },
+      {
+        title: "Run the Installer",
+        content: "Double-click the downloaded .exe file and follow the installation wizard",
+        code: "Right-click → 'Run as administrator' (recommended)",
+        image: "⚙️",
+        screenshotAlt: "MongoDB Compass installation wizard welcome screen"
+      },
+      {
+        title: "Launch MongoDB Compass",
+        content: "Find MongoDB Compass in your Start menu or desktop and launch it",
+        code: "Start → MongoDB Compass",
+        image: "🚀",
+        screenshotAlt: "MongoDB Compass welcome screen after first launch"
+      }
+    ],
+    shell: [
+      {
+        title: "Go to Mongo DB tools",
+        content: "Visit https://www.mongodb.com/try/download/tools ",
+        image: "",
+        screenshot:pic3,
+        screenshotAlt: "MongoDB Community Server download page with Windows option selected"
+      },
+      {
+        title: "Install Mongo DB Shell",
+        content: "Select Windows and download msi installer", 
+        image: "",
+        screenshot:pic4,
+        screenshotAlt: "MongoDB Server installation wizard showing Complete installation option"
+      },
+      {
+        title: "Run the installer",
+        content: "Run the .msi installer and choose 'Complete' installation",
+        image: "🛤️",
+        screenshotAlt: "Windows Environment Variables dialog showing PATH configuration"
+      },
+      {
+        title: "Verify Installation",
+        content: "Open any powershell and run the command mongosh --version to test the MongoDB shell(Mongosh)",
+        image: "✅",
+        screenshotAlt: "Command Prompt showing mongosh version output confirming successful installation"
+      }
+    ]
   };
 
   const currentSteps = currentStep === 1 ? 
-    installationSteps[selectedOS].compass : 
-    installationSteps[selectedOS].shell;
+    installationSteps.compass : 
+    installationSteps.shell;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
@@ -233,7 +103,7 @@ const Installation = ({ onBackToPath, onModuleComplete }) => {
             </button>
             <div className="flex items-center space-x-3">
               <BearMascot size="40px" />
-              <h1 className="text-2xl font-bold text-gray-800">MongoDB Installation Guide</h1>
+              <h1 className="text-2xl font-bold text-gray-800">MongoDB Installation Guide - Windows</h1>
             </div>
           </div>
           <div className="text-sm text-gray-600">
@@ -274,27 +144,7 @@ const Installation = ({ onBackToPath, onModuleComplete }) => {
           </div>
         </div>
 
-        {/* Operating System Selector */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Select Your Operating System</h2>
-          <div className="flex flex-wrap gap-4">
-            {['windows', 'mac', 'linux'].map((os) => (
-              <button
-                key={os}
-                onClick={() => setSelectedOS(os)}
-                className={`px-6 py-3 rounded-lg font-medium transition-colors ${
-                  selectedOS === os
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                {os === 'windows' && '🪟 Windows'}
-                {os === 'mac' && '🍎 macOS'}
-                {os === 'linux' && '🐧 Linux'}
-              </button>
-            ))}
-          </div>
-        </div>
+        {/* Operating System Selector - Removed, Windows only */}
 
         {/* Installation Steps */}
         <div className="bg-white rounded-xl shadow-lg p-6">
@@ -303,7 +153,7 @@ const Installation = ({ onBackToPath, onModuleComplete }) => {
               {currentStep === 1 ? 'MongoDB Compass Installation' : 'MongoDB Shell Installation'}
             </h2>
             <div className="text-sm text-gray-500">
-              {selectedOS.charAt(0).toUpperCase() + selectedOS.slice(1)}
+              Windows
             </div>
           </div>
 
@@ -337,10 +187,7 @@ const Installation = ({ onBackToPath, onModuleComplete }) => {
                       {/* Screenshot */}
                       {step.screenshot && (
                         <div className="mb-6">
-                          <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
-                            <span className="text-lg mr-2">📷</span>
-                            Visual Guide
-                          </h4>
+                          
                           <div className="relative">
                             <img 
                               src={step.screenshot}
@@ -366,11 +213,7 @@ const Installation = ({ onBackToPath, onModuleComplete }) => {
                         </div>
                       )}
                       
-                      {step.code && (
-                        <div className="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm overflow-x-auto">
-                          <pre>{step.code}</pre>
-                        </div>
-                      )}
+                     
                       
                       <div className="mt-4">
                         <button
@@ -404,7 +247,7 @@ const Installation = ({ onBackToPath, onModuleComplete }) => {
               <p className="text-green-700 mb-4">
                 Great job! You've successfully installed{' '}
                 {currentStep === 1 ? 'MongoDB Compass' : 'MongoDB Shell'}.
-                {currentStep === 1 && currentSteps.length < installationSteps[selectedOS].shell.length
+                {currentStep === 1 && currentSteps.length < installationSteps.shell.length
                   ? ' Consider installing MongoDB Shell as well for command-line access.'
                   : ''}
               </p>
@@ -444,23 +287,7 @@ const Installation = ({ onBackToPath, onModuleComplete }) => {
           </ul>
         </div>
 
-        {/* Screenshot Information */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h3 className="text-lg font-bold text-blue-800 mb-3">📷 About Screenshots</h3>
-          <p className="text-blue-700 mb-3">
-            This installation guide includes visual screenshots for each step to make the process easier to follow.
-          </p>
-          <div className="bg-blue-100 border border-blue-300 rounded-lg p-4">
-            <h4 className="font-semibold text-blue-800 mb-2">For Developers:</h4>
-            <p className="text-blue-700 text-sm mb-2">
-              To add actual screenshots, place image files in the <code className="bg-blue-200 px-1 rounded">public/screenshots/</code> directory.
-              See the README.md file in that directory for detailed instructions.
-            </p>
-            <p className="text-blue-600 text-xs">
-              Missing screenshots will automatically show helpful placeholders with descriptions.
-            </p>
-          </div>
-        </div>
+       
       </div>
     </div>
   );
