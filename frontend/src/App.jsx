@@ -10,13 +10,14 @@ import BearMascot from "./Components/BearMascot"
 import Module1 from "./Components/Module/Module1"
 import Module2 from "./Components/Module/Module2"
 import Module3 from "./Components/Module/Module3"
+import Module4 from "./Components/Module/Module4"
 import Installation from "./Components/Module/Installation"
 import Task1 from "./Components/Task/Task1"
 import Taskk2 from "./Components/Task/Taskk2"
 import FloatingBear from './Components/FloatingBear';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('home'); // 'home', 'learning', 'login', 'signup', 'module1', 'module2', 'module3', 'installation', 'task1', 'task2'
+  const [currentPage, setCurrentPage] = useState('home'); // 'home', 'learning', 'login', 'signup', 'module1', 'module2', 'module3', 'module4', 'installation', 'task1', 'task2'
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -93,6 +94,11 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleStartModule4 = () => {
+    setCurrentPage('module4');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleStartTask1 = () => {
     setCurrentPage('task1');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -136,7 +142,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation - Hide on auth pages and modules */}
-      {currentPage !== 'login' && currentPage !== 'signup' && currentPage !== 'module1' && currentPage !== 'module2' && currentPage !== 'module3' && currentPage !== 'installation' && currentPage !== 'task1' && currentPage !== 'task2' && (
+      {currentPage !== 'login' && currentPage !== 'signup' && currentPage !== 'module1' && currentPage !== 'module2' && currentPage !== 'module3' && currentPage !== 'module4' && currentPage !== 'installation' && currentPage !== 'task1' && currentPage !== 'task2' && (
         <Navbar user={user} onLogout={handleLogout} onGetStarted={handleGetStarted} />
       )}
 
@@ -178,6 +184,7 @@ function App() {
             onStartModule1={handleStartModule1}
             onStartModule2={handleStartModule2}
             onStartModule3={handleStartModule3}
+            onStartModule4={handleStartModule4}
             onStartTask1={handleStartTask1}
             onStartTask2={handleStartTask2}
             onStartInstallation={handleStartInstallation}
@@ -202,6 +209,13 @@ function App() {
 
       {currentPage === 'module3' && (
         <Module3 
+          onBackToPath={handleBackToPath}
+          onModuleComplete={handleModuleComplete}
+        />
+      )}
+
+      {currentPage === 'module4' && (
+        <Module4 
           onBackToPath={handleBackToPath}
           onModuleComplete={handleModuleComplete}
         />

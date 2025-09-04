@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import BearMascot from './BearMascot';
 
-const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartTask1, onStartTask2, onStartInstallation, completedModules }) => {
+const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartModule4, onStartTask1, onStartTask2, onStartInstallation, completedModules }) => {
   const [completedCheckpoints, setCompletedCheckpoints] = useState(completedModules?.map(m => m.id) || []);
   const [currentCheckpoint, setCurrentCheckpoint] = useState(() => {
     // If no modules completed, start with checkpoint 0
@@ -61,24 +61,8 @@ const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartT
       questions: 0,
       xp: 60
     },
-    {
+     {
       id: 3,
-      title: "CRUD Operations",
-      description: "Create, Read, Update, Delete",
-      type: "checkpoint",
-      questions: 8,
-      xp: 100
-    },
-    {
-      id: 4,
-      title: "Task 2",
-      description: "Practice CRUD operations",
-      type: "task",
-      questions: 0,
-      xp: 80
-    },
-    {
-      id: 5,
       title: "Installation Guide",
       description: "Install MongoDB Compass & Shell",
       type: "installation",
@@ -86,7 +70,31 @@ const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartT
       xp: 50
     },
     {
+      id: 4,
+      title: "CRUD Operations",
+      description: "Create, Read, Update, Delete",
+      type: "checkpoint",
+      questions: 8,
+      xp: 100
+    },
+    {
+      id: 5,
+      title: "Task 2",
+      description: "Practice CRUD operations",
+      type: "task",
+      questions: 0,
+      xp: 80
+    },
+    {
       id: 6,
+      title: "Implement Queries on MongoDB Shell",
+      description: "Learn shell commands and queries",
+      type: "checkpoint",
+      questions: 8,
+      xp: 100
+    },
+    {
+      id: 7,
       title: "Queries & Filters",
       description: "Finding and filtering data",
       type: "checkpoint",
@@ -94,7 +102,7 @@ const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartT
       xp: 85
     },
     {
-      id: 7,
+      id: 8,
       title: "Indexing",
       description: "Optimizing query performance",
       type: "checkpoint",
@@ -102,7 +110,7 @@ const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartT
       xp: 90
     },
     {
-      id: 8,
+      id: 9,
       title: "Aggregation Pipeline",
       description: "Advanced data processing",
       type: "checkpoint",
@@ -110,7 +118,7 @@ const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartT
       xp: 120
     },
     {
-      id: 9,
+      id: 10,
       title: "MongoDB Expert",
       description: "Complete your MongoDB journey!",
       type: "end",
@@ -132,11 +140,14 @@ const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartT
       } else if (checkpointId === 2) {
         onStartTask1();
       } else if (checkpointId === 3) {
-        onStartModule3();
+       onStartInstallation();
       } else if (checkpointId === 4) {
-        onStartTask2();
+       onStartModule3();
       } else if (checkpointId === 5) {
-        onStartInstallation();
+        //onStartInstallation();
+         onStartTask2();
+      } else if (checkpointId === 6) {
+        onStartModule4();
       }
       // Add more module navigation here for other checkpoints
     //}
@@ -193,8 +204,11 @@ const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartT
         
         {/* Header */}
         <div className="text-center mb-16">
-          <h1 className="text-6xl font-bold text-gray-800 mb-4">
-            <span className="text-blue-600">QUIZ</span>
+          <div className="flex justify-center mb-6">
+            <BearMascot size="80px" />
+          </div>
+          <h1 className="text-3xl font-bold text-gray-800 mb-4">
+            <span className="text-blue-600">START YOUR JOURNEY</span>
           </h1>
           <p className="text-xl text-gray-600 mb-8">
             Master MongoDB through interactive checkpoints

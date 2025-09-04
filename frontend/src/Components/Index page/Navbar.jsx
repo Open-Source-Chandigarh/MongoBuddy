@@ -1,3 +1,5 @@
+import BearMascot from '../BearMascot';
+
 function Navbar({ user, onLogout, onGetStarted }){  
     return(
   <nav className="bg-white shadow-sm border-b border-gray-200">
@@ -7,7 +9,7 @@ function Navbar({ user, onLogout, onGetStarted }){
               <div className="flex-shrink-0">
                 <div className="flex items-center space-x-2">
                   <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">MB</span>
+                    <BearMascot size="20px" />
                   </div>
                   <span className="text-xl font-bold text-gray-900">Mongo Buddy</span>
                 </div>

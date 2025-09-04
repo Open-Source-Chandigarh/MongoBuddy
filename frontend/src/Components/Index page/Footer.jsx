@@ -1,3 +1,5 @@
+import BearMascot from '../BearMascot';
+
 function Footer(){
     return (
           <footer className="bg-gray-900 text-white py-12">
@@ -6,7 +8,7 @@ function Footer(){
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">MB</span>
+                  <BearMascot size="20px" />
                 </div>
                 <span className="text-xl font-bold">Mongo Buddy</span>
               </div>
