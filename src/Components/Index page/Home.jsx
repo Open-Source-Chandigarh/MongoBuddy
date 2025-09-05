@@ -8,7 +8,7 @@ const Home = ({ onStartLearning }) => {
   return (
     <div>
       {/* Hero Section */}
-     <EnhancedHero></EnhancedHero>
+     <EnhancedHero onStartLearning={onStartLearning} />
 
       {/* Test Bear - Simple version to check if it works */}
       <div className="py-20 bg-white text-center">

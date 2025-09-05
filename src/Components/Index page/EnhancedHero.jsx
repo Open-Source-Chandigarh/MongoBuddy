@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import BearMascot from '../BearMascot';
 
-const EnhancedHero = () => {
+const EnhancedHero = ({ onStartLearning }) => {
   const [currentPhrase, setCurrentPhrase] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -17,7 +17,7 @@ const EnhancedHero = () => {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [phrases.length]);
 
   return (
     <section className="relative min-h-screen bg-gradient-to-br from-green-50 via-white to-green-100 overflow-hidden">
@@ -64,7 +64,9 @@ const EnhancedHero = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
-              <button className="group relative px-8 py-4 bg-green-600 text-white rounded-xl font-semibold text-lg 
+              <button 
+                onClick={onStartLearning}
+                className="group relative px-8 py-4 bg-green-600 text-white rounded-xl font-semibold text-lg 
                 hover:bg-green-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
                 <span className="relative z-10">🚀 Start Learning</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-green-700 rounded-xl opacity-0 

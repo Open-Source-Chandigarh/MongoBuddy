@@ -1,6 +1,6 @@
 import BearMascot from '../BearMascot';
 
-function Navbar({ user, onLogout, onGetStarted }){  
+function Navbar({ user, onLogout, onGetStarted, onGoHome, onGoToModules }){  
     return(
   <nav className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -16,9 +16,18 @@ function Navbar({ user, onLogout, onGetStarted }){
               </div>
             </div>
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#" className="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium">Home</a>
-              <a href="#" className="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium">Modules</a>
-              <a href="#" className="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium">Leaderboard</a>
+              <button 
+                onClick={onGoHome}
+                className="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium cursor-pointer"
+              >
+                Home
+              </button>
+              <button 
+                onClick={onGoToModules}
+                className="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium cursor-pointer"
+              >
+                Modules
+              </button>
               
               {user ? (
                 <div className="flex items-center space-x-4">
