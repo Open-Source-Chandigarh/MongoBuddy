@@ -1,192 +1,223 @@
 import React, { useState } from 'react';
 import BearMascot from '../BearMascot';
 
-const Module5 = ({ onBackToPath, onModuleComplete }) => {
+const Module6 = ({ onBackToPath, onModuleComplete }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
   const [score, setScore] = useState(0);
   const [showTheory, setShowTheory] = useState(true); // Start with theory
 
-  // Quiz questions based on MongoDB Queries and Filters
+  // Quiz questions based on MongoDB Indexing
   const questions = [
     {
       id: 1,
-      question: "Which operator is used to find documents where a field is greater than a specific value?",
+      question: "What is the primary purpose of database indexes in MongoDB?",
       options: [
-        "$gt",
-        "$gte",
-        "$lt",
-        "$eq"
+        "To store backup data",
+        "To improve query performance",
+        "To compress data",
+        "To encrypt documents"
       ],
-      correct: 0,
-      explanation: "$gt (greater than) operator is used to find documents where a field value is greater than the specified value."
+      correct: 1,
+      explanation: "Indexes are data structures that improve the speed of data retrieval operations by creating shortcuts to find documents quickly."
     },
     {
       id: 2,
-      question: "What does the $in operator do in MongoDB queries?",
+      question: "Which command creates a single field index in MongoDB?",
       options: [
-        "Checks if a field exists",
-        "Matches any value in an array of values",
-        "Performs text search",
-        "Sorts results in ascending order"
+        "db.collection.createIndex({ field: 1 })",
+        "db.collection.addIndex({ field: 1 })",
+        "db.collection.newIndex({ field: 1 })",
+        "db.collection.makeIndex({ field: 1 })"
       ],
-      correct: 1,
-      explanation: "The $in operator matches documents where the field value equals any value in the specified array."
+      correct: 0,
+      explanation: "The createIndex() method is used to create indexes in MongoDB. The value 1 indicates ascending order."
     },
     {
       id: 3,
-      question: "Which logical operator ensures ALL conditions must be true?",
+      question: "What does a compound index in MongoDB contain?",
       options: [
-        "$or",
-        "$nor",
-        "$and",
-        "$not"
+        "Multiple collections",
+        "Multiple databases",
+        "Multiple fields from the same collection",
+        "Multiple data types"
       ],
       correct: 2,
-      explanation: "$and operator ensures that all specified conditions must be true for a document to match."
+      explanation: "A compound index includes multiple fields from the same collection and can optimize queries that filter on multiple fields."
     },
     {
       id: 4,
-      question: "What does projection do in MongoDB queries?",
+      question: "Which index type is best for full-text search in MongoDB?",
       options: [
-        "Sorts the results",
-        "Limits the number of results",
-        "Controls which fields are returned",
-        "Filters documents by field existence"
+        "Single field index",
+        "Compound index",
+        "Text index",
+        "Sparse index"
       ],
       correct: 2,
-      explanation: "Projection controls which fields are included or excluded in the query results, reducing data transfer and improving performance."
+      explanation: "Text indexes are specifically designed for full-text search operations, allowing you to search for words and phrases within string content."
     },
     {
       id: 5,
-      question: "Which operator is used to query arrays for documents containing all specified values?",
+      question: "What happens to query performance without proper indexing?",
       options: [
-        "$elemMatch",
-        "$all",
-        "$size",
-        "$push"
+        "Queries run faster",
+        "MongoDB performs collection scans",
+        "Data gets corrupted",
+        "Indexes are created automatically"
       ],
       correct: 1,
-      explanation: "$all operator matches documents where an array field contains all the specified values."
+      explanation: "Without indexes, MongoDB must perform collection scans, examining every document to find matches, which is slow for large collections."
     },
     {
       id: 6,
-      question: "What is the purpose of the explain() method?",
+      question: "Which method shows the execution plan of a query?",
       options: [
-        "To format query results",
-        "To analyze query performance",
-        "To create indexes",
-        "To sort results"
+        "analyze()",
+        "performance()",
+        "explain()",
+        "debug()"
+      ],
+      correct: 2,
+      explanation: "The explain() method provides detailed information about how MongoDB executes a query, including which indexes are used."
+    },
+    {
+      id: 7,
+      question: "What is the trade-off of having too many indexes?",
+      options: [
+        "Faster queries but slower writes",
+        "Slower queries but faster writes", 
+        "No trade-offs exist",
+        "Indexes don't affect performance"
+      ],
+      correct: 0,
+      explanation: "While indexes speed up read operations, they slow down write operations because MongoDB must update the indexes whenever documents are inserted, updated, or deleted."
+    },
+    {
+      id: 8,
+      question: "Which index order should you use for sorting in descending order?",
+      options: [
+        "{ field: 1 }",
+        "{ field: -1 }",
+        "{ field: 0 }",
+        "{ field: 'desc' }"
       ],
       correct: 1,
-      explanation: "The explain() method provides detailed information about query execution, helping analyze performance and optimization opportunities."
+      explanation: "In MongoDB, -1 indicates descending order for indexes, while 1 indicates ascending order."
     }
   ];
 
   // Theory content
   const theoryContent = {
-    title: "MongoDB Queries and Filters",
-    description: "Master advanced querying techniques and filtering in MongoDB",
+    title: "MongoDB Indexing",
+    description: "Master database indexing for optimal query performance",
     sections: [
       {
-        title: "1. Basic Query Operations",
+        title: "1. Introduction to Database Indexing",
         content: [
-          "MongoDB queries retrieve specific documents from collections based on criteria.",
-          "The find() method is the primary way to query documents in MongoDB.",
-          "You can specify filter conditions to get exactly the documents you need.",
-          "Basic syntax: db.collection.find({ field: value })"
+          "Database indexes are data structures that improve the speed of data retrieval operations.",
+          "Indexes create shortcuts to find documents quickly without scanning entire collections.",
+          "They work similarly to book indexes, pointing to specific locations of data.",
+          "MongoDB automatically creates an index on the _id field for every collection.",
+          "Proper indexing is crucial for application performance as data grows."
         ]
       },
       {
-        title: "2. Comparison Operators",
+        title: "2. How Indexes Work",
         content: [
-          "• $gt (greater than): { age: { $gt: 18 } }",
-          "• $gte (greater than or equal): { score: { $gte: 90 } }",
-          "• $lt (less than): { price: { $lt: 100 } }",
-          "• $lte (less than or equal): { rating: { $lte: 5 } }",
-          "• $ne (not equal): { status: { $ne: 'inactive' } }",
-          "• $in (in array): { grade: { $in: ['A', 'B'] } }",
-          "• $nin (not in array): { category: { $nin: ['spam', 'deleted'] } }"
+          "• Indexes store references to document locations sorted by field values",
+          "• MongoDB can quickly locate documents using binary search on sorted indexes",
+          "• Without indexes, MongoDB performs collection scans (examines every document)",
+          "• Collection scans become exponentially slower as data volume increases",
+          "• Indexes transform O(n) operations into O(log n) for better performance",
+          "• The query optimizer automatically chooses the best index for each query"
         ]
       },
       {
-        title: "3. Logical Operators",
+        title: "3. Single Field Indexes",
         content: [
-          "• $and: All conditions must be true - { $and: [{ age: { $gte: 18 } }, { status: 'active' }] }",
-          "• $or: At least one condition must be true - { $or: [{ subject: 'Math' }, { subject: 'Physics' }] }",
-          "• $not: Negates the specified condition - { score: { $not: { $lt: 60 } } }",
-          "• $nor: None of the conditions should be true - { $nor: [{ expired: true }, { banned: true }] }",
-          "These operators allow you to create complex query logic by combining multiple conditions."
+          "• Single field indexes are the most basic type of index in MongoDB",
+          "• Created on individual fields: db.collection.createIndex({ fieldName: 1 })",
+          "• Ascending order (1) vs descending order (-1) affects sort performance",
+          "• Ideal for queries that filter or sort on a single field",
+          "• Example: db.users.createIndex({ email: 1 }) for email lookups",
+          "• Can dramatically improve performance for equality and range queries"
         ]
       },
       {
-        title: "4. Field Existence and Type Queries",
+        title: "4. Compound Indexes",
         content: [
-          "• $exists: Check if a field exists - { email: { $exists: true } }",
-          "• $type: Filter by BSON data type - { name: { $type: 'string' } }",
-          "Common BSON types: 'string', 'number', 'array', 'object', 'bool', 'date'",
-          "Useful for data validation and cleanup operations.",
-          "Example: Find documents with missing fields - { phoneNumber: { $exists: false } }"
+          "• Compound indexes include multiple fields from the same collection",
+          "• Created with: db.collection.createIndex({ field1: 1, field2: -1, field3: 1 })",
+          "• Field order matters significantly for query optimization",
+          "• Follow the ESR rule: Equality, Sort, Range for optimal field ordering",
+          "• Can support queries on any prefix of the indexed fields",
+          "• Example: Index on {status: 1, date: -1} supports queries on status or status+date"
         ]
       },
       {
-        title: "5. Array Queries",
+        title: "5. Index Types and Specializations",
         content: [
-          "• $all: Array must contain all specified values - { subjects: { $all: ['Math', 'Physics'] } }",
-          "• $elemMatch: Array elements match multiple conditions - { grades: { $elemMatch: { subject: 'Math', score: { $gte: 90 } } } }",
-          "• $size: Query by array length - { tags: { $size: 3 } }",
-          "• Array element by position: { 'grades.0.score': { $gt: 85 } }",
-          "MongoDB provides powerful capabilities for querying array fields effectively."
+          "• Text Indexes: For full-text search with db.collection.createIndex({ title: 'text' })",
+          "• Geospatial Indexes: For location-based queries with 2dsphere or 2d indexes",
+          "• Sparse Indexes: Only index documents that contain the indexed field",
+          "• Partial Indexes: Index only documents that meet specified criteria",
+          "• TTL Indexes: Automatically delete documents after a specified time period",
+          "• Unique Indexes: Ensure field values are unique across the collection"
         ]
       },
       {
-        title: "6. Text and Pattern Matching",
+        title: "6. Index Performance Analysis",
         content: [
-          "• $regex: Pattern matching - { name: { $regex: '^John', $options: 'i' } }",
-          "• $text: Full-text search (requires text index) - { $text: { $search: 'mongodb database' } }",
-          "• Case-insensitive searches using 'i' option",
-          "• Word boundary matching: { description: { $regex: '\\\\bmongodb\\\\b', $options: 'i' } }",
-          "Regular expressions provide powerful string matching capabilities."
+          "• Use explain() to analyze query execution plans and performance",
+          "• explain('executionStats') provides detailed timing and document examination data",
+          "• Key metrics: totalDocsExamined, totalDocsReturned, executionTimeMillis",
+          "• IXSCAN indicates index usage, COLLSCAN indicates full collection scan",
+          "• Use MongoDB Profiler to identify slow queries automatically"
         ]
       },
       {
-        title: "7. Projection and Field Selection",
+        title: "7. Index Creation Strategies",
         content: [
-          "• Include specific fields: db.collection.find({}, { name: 1, email: 1 })",
-          "• Exclude specific fields: db.collection.find({}, { password: 0, internalNotes: 0 })",
-          "• Exclude _id field: { name: 1, score: 1, _id: 0 }",
-          "• Array projection: { 'grades.$': 1 } - returns only matching array element",
-          "• Slice arrays: { grades: { $slice: 2 } } - limits array elements returned"
+          "• Analyze query patterns before creating indexes",
+          "• Create indexes for frequently executed queries first",
+          "• Use compound indexes for multi-field queries",
+          "• Consider query selectivity - fields with high cardinality are better candidates",
+          "• Background index creation (background: true) prevents blocking operations",
+          "• Test index effectiveness with explain() before and after creation"
         ]
       },
       {
-        title: "8. Sorting and Limiting",
+        title: "8. Index Maintenance and Management",
         content: [
-          "• Sort ascending: .sort({ name: 1 })",
-          "• Sort descending: .sort({ score: -1 })",
-          "• Multiple field sorting: .sort({ grade: 1, score: -1 })",
-          "• Limit results: .limit(10)",
-          "• Skip results for pagination: .skip(20).limit(10)",
-          "• Combined: .find().sort({ date: -1 }).skip(10).limit(5)"
+          "• View existing indexes: db.collection.getIndexes()",
+          "• Drop unused indexes: db.collection.dropIndex('indexName')",
+         "• Index size affects memory usage - monitor with db.collection.totalIndexSize()",
+          "• Regular maintenance prevents index bloat and maintains performance"
         ]
       },
       {
-        title: "9. Query Performance",
+        title: "9. Index Limitations and Trade-offs",
         content: [
-          "• Use explain() to analyze query performance: .find().explain('executionStats')",
-          "• Create indexes for frequently queried fields: db.collection.createIndex({ email: 1 })",
-          "• Compound indexes for multi-field queries: db.collection.createIndex({ status: 1, date: -1 })",
-          "• Text indexes for full-text search: db.collection.createIndex({ title: 'text', content: 'text' })",
-          "• Monitor execution time and documents examined for optimization opportunities"
+          "• Indexes consume additional storage space and memory",
+          "• Write operations (insert, update, delete) become slower with more indexes",
+          "• Maximum 64 indexes per collection in MongoDB",
+          "• Compound indexes limited to 32 fields maximum",
+          "• Index key size cannot exceed 1024 bytes",
+          "• Balance between read performance and write overhead"
         ]
       },
       {
-        title: "10. Best Practices",
+        title: "10. Best Practices and Optimization",
         content: [
-          "• Index frequently queried fields to improve performance",
-          "• Use projection to limit returned data and reduce network traffic",
-         
+          "• Create indexes based on actual query patterns, not assumptions",
+          "• Use the ESR (Equality, Sort, Range) rule for compound index field ordering",
+          "• Avoid over-indexing - only create indexes that provide significant value",
+          "• Monitor and remove unused indexes to improve write performance",
+          "• Use hint() to force specific index usage for testing",
+          "• Consider partial indexes for queries with consistent filter conditions",
+          "• Plan index strategy during application design phase"
         ]
       }
     ]
@@ -194,15 +225,6 @@ const Module5 = ({ onBackToPath, onModuleComplete }) => {
 
   const handleStartQuiz = () => {
     setShowTheory(false);
-  };
-
-  const handleExitQuiz = () => {
-    // Reset quiz state when exiting
-    setCurrentQuestion(0);
-    setSelectedAnswers({});
-    setShowResults(false);
-    setScore(0);
-    setShowTheory(true);
   };
 
   const handleAnswerSelect = (questionId, answerIndex) => {
@@ -239,7 +261,7 @@ const Module5 = ({ onBackToPath, onModuleComplete }) => {
   };
 
   const handleCompleteModule = () => {
-    onModuleComplete('module5', score);
+    onModuleComplete('module6', score);
   };
 
   const resetQuiz = () => {
@@ -255,14 +277,14 @@ const Module5 = ({ onBackToPath, onModuleComplete }) => {
 
   if (showTheory) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
         {/* Header */}
-        <div className="bg-white shadow-sm border-b border-green-100">
+        <div className="bg-white shadow-sm border-b border-blue-100">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">
               <button
                 onClick={onBackToPath}
-                className="flex items-center px-4 py-2 text-green-600 hover:text-green-700 hover:bg-green-50 rounded-lg transition-colors"
+                className="flex items-center px-4 py-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
               >
                 ← Back to Learning Path
               </button>
@@ -270,8 +292,8 @@ const Module5 = ({ onBackToPath, onModuleComplete }) => {
               <div className="flex items-center space-x-3">
                 <BearMascot className="w-8 h-8" />
                 <div>
-                  <h1 className="text-2xl font-bold text-green-800">{theoryContent.title}</h1>
-                  <p className="text-green-600">{theoryContent.description}</p>
+                  <h1 className="text-2xl font-bold text-blue-800">{theoryContent.title}</h1>
+                  <p className="text-blue-600">{theoryContent.description}</p>
                 </div>
               </div>
             </div>
@@ -290,12 +312,12 @@ const Module5 = ({ onBackToPath, onModuleComplete }) => {
                       <li key={itemIndex} className="text-gray-600 leading-relaxed">
                         {item.startsWith('•') ? (
                           <span className="flex items-start">
-                            <span className="text-green-600 mr-2 mt-1">•</span>
+                            <span className="text-blue-600 mr-2 mt-1">•</span>
                             <span>{item.substring(1).trim()}</span>
                           </span>
                         ) : (
                           <span className="flex items-start">
-                            <span className="text-green-600 mr-2 mt-1">•</span>
+                            <span className="text-blue-600 mr-2 mt-1">•</span>
                             <span>{item}</span>
                           </span>
                         )}
@@ -311,7 +333,7 @@ const Module5 = ({ onBackToPath, onModuleComplete }) => {
               <div className="text-center">
                 <button
                   onClick={handleStartQuiz}
-                  className="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium text-lg"
+                  className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg"
                 >
                   🎯 Start Quiz ({questions.length} questions)
                 </button>
@@ -328,7 +350,7 @@ const Module5 = ({ onBackToPath, onModuleComplete }) => {
     const passed = percentage >= 70;
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
             <div className="px-8 py-12 text-center">
@@ -353,7 +375,7 @@ const Module5 = ({ onBackToPath, onModuleComplete }) => {
                 {passed ? (
                   <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                     <p className="text-green-800">
-                      Excellent work! You've mastered MongoDB queries and filters. 
+                      Excellent work! You've mastered MongoDB indexing concepts. 
                       You're ready to move on to the next module!
                     </p>
                   </div>
@@ -422,7 +444,7 @@ const Module5 = ({ onBackToPath, onModuleComplete }) => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button
                   onClick={resetQuiz}
-                  className="px-6 py-3 border border-green-600 text-green-600 rounded-lg hover:bg-green-50 transition-colors"
+                  className="px-6 py-3 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
                 >
                   🔄 Retake Quiz
                 </button>
@@ -430,7 +452,7 @@ const Module5 = ({ onBackToPath, onModuleComplete }) => {
                 {passed && (
                   <button
                     onClick={handleCompleteModule}
-                    className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                   >
                     ✅ Complete Module
                   </button>
@@ -451,23 +473,23 @@ const Module5 = ({ onBackToPath, onModuleComplete }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-green-100">
+      <div className="bg-white shadow-sm border-b border-blue-100">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <BearMascot className="w-8 h-8" />
               <div>
-                <h1 className="text-xl font-bold text-green-800">MongoDB Queries Quiz</h1>
-                <p className="text-green-600 text-sm">
+                <h1 className="text-xl font-bold text-blue-800">MongoDB Indexing Quiz</h1>
+                <p className="text-blue-600 text-sm">
                   Question {currentQuestion + 1} of {questions.length}
                 </p>
               </div>
             </div>
             
             <div className="text-right">
-              <div className="text-lg font-bold text-green-600">
+              <div className="text-lg font-bold text-blue-600">
                 {Math.round(((currentQuestion + 1) / questions.length) * 100)}%
               </div>
               <div className="text-xs text-gray-500">Progress</div>
@@ -477,7 +499,7 @@ const Module5 = ({ onBackToPath, onModuleComplete }) => {
           {/* Progress Bar */}
           <div className="mt-4 w-full bg-gray-200 rounded-full h-2">
             <div 
-              className="bg-green-500 h-2 rounded-full transition-all duration-300"
+              className="bg-blue-500 h-2 rounded-full transition-all duration-300"
               style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
             ></div>
           </div>
@@ -499,8 +521,8 @@ const Module5 = ({ onBackToPath, onModuleComplete }) => {
                   onClick={() => handleAnswerSelect(currentQuestionData.id, index)}
                   className={`w-full text-left p-4 rounded-lg border-2 transition-colors ${
                     selectedAnswers[currentQuestionData.id] === index
-                      ? 'border-green-500 bg-green-50 text-green-900'
-                      : 'border-gray-200 hover:border-green-300 hover:bg-green-50'
+                      ? 'border-blue-500 bg-blue-50 text-blue-900'
+                      : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
                   }`}
                 >
                   <span className="font-medium">
@@ -514,27 +536,17 @@ const Module5 = ({ onBackToPath, onModuleComplete }) => {
           {/* Navigation */}
           <div className="px-8 py-4 bg-gray-50 border-t border-gray-200">
             <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handlePrevQuestion}
-                  disabled={currentQuestion === 0}
-                  className={`px-4 py-2 rounded-lg transition-colors ${
-                    currentQuestion === 0
-                      ? 'text-gray-400 cursor-not-allowed'
-                      : 'text-green-600 hover:bg-green-50'
-                  }`}
-                >
-                  ← Previous
-                </button>
-                
-                <button
-                  onClick={handleExitQuiz}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors border border-gray-300"
-                  title="Return to theory section"
-                >
-                  📚 Exit Quiz
-                </button>
-              </div>
+              <button
+                onClick={handlePrevQuestion}
+                disabled={currentQuestion === 0}
+                className={`px-4 py-2 rounded-lg transition-colors ${
+                  currentQuestion === 0
+                    ? 'text-gray-400 cursor-not-allowed'
+                    : 'text-blue-600 hover:bg-blue-50'
+                }`}
+              >
+                ← Previous
+              </button>
               
               <span className="text-sm text-gray-500">
                 {currentQuestion + 1} / {questions.length}
@@ -546,7 +558,7 @@ const Module5 = ({ onBackToPath, onModuleComplete }) => {
                 className={`px-4 py-2 rounded-lg transition-colors ${
                   !hasAnswered
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-green-600 text-white hover:bg-green-700'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
                 }`}
               >
                 {isLastQuestion ? 'Submit Quiz' : 'Next →'}
@@ -559,4 +571,4 @@ const Module5 = ({ onBackToPath, onModuleComplete }) => {
   );
 };
 
-export default Module5;
+export default Module6;

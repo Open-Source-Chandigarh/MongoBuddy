@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import BearMascot from './BearMascot';
 
-const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartModule4, onStartModule5, onStartTask1, onStartTask2, onStartInstallation, completedModules }) => {
+const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartModule4, onStartModule5, onStartModule6, onStartTask1, onStartTask2, onStartInstallation, completedModules }) => {
   const [completedCheckpoints, setCompletedCheckpoints] = useState(completedModules?.map(m => m.id) || []);
   const [currentCheckpoint, setCurrentCheckpoint] = useState(() => {
     // If no modules completed, start with checkpoint 0
@@ -150,6 +150,8 @@ const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartM
         onStartModule4();
       } else if (checkpointId === 7) {
         onStartModule5();
+      } else if (checkpointId === 8) {
+        onStartModule6();
       }
       // Add more module navigation here for other checkpoints
     //}

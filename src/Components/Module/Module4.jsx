@@ -167,29 +167,22 @@ db.students.findOneAndDelete({ age: { $lt: 18 } })`,
       screenshot: "/screenshots/mongosh-delete.png",
       screenshotAlt: "MongoDB shell showing delete operations and confirmations"
     },
-/*    {
+   {
       id: 8,
-      title: "Working with Indexes",
-      description: "Learn how to create and manage indexes for better performance",
-      content: "Indexes improve query performance by creating efficient lookup structures.",
-      codeExample: `// Create single field index
-db.students.createIndex({ name: 1 })
+      title: "Cursor Methods",
+      description:"" ,
+      content: ["Count: find().count() -> returns the number of documents",
+        "forEach: find().forEach(doc=>(print(doc.name))) -> prints all the names from each document",
+        "Sort: find().sort({age:-1})  ->  1 for ascending order -1 for descending order",
+        "Limit: find().limit(5)  -> returns only 5 documents ",
+        "Skip:  find().skip(5)   -> skip the first 5 documents",
 
-// Create compound index
-db.students.createIndex({ major: 1, gpa: -1 })
-
-// View indexes
-db.students.getIndexes()
-
-// Explain query execution
-db.students.find({ name: "Alice Smith" }).explain("executionStats")
-
-// Drop an index
-db.students.dropIndex({ name: 1 })`,
+      ],
+      
       screenshot: "/screenshots/mongosh-indexes.png",
       screenshotAlt: "MongoDB shell showing index creation and management"
     },
-    {
+/*    {
       id: 9,
       title: "Aggregation Basics",
       description: "Learn basic aggregation pipeline operations",
