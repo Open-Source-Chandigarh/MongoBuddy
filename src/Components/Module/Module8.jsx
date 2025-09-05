@@ -1442,7 +1442,7 @@ db.users.find(
     }));
   };
 
-  const categories = [...new Set(interviewQuestions.map(q => q.category))];
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50">
@@ -1471,33 +1471,7 @@ db.users.find(
       {/* Content */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Categories Overview */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">📋 Question Categories</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-            {categories.map((category, index) => (
-              <div key={index} className="bg-white rounded-lg p-4 shadow-sm border border-green-100">
-                <div className="text-center">
-                  <div className="text-2xl mb-2">
-                    {category === 'Fundamentals' && '🏗️'}
-                    {category === 'Data Modeling' && '📊'}
-                    {category === 'Indexing' && '🔍'}
-                    {category === 'Aggregation' && '⚡'}
-                    {category === 'Sharding' && '🌐'}
-                    {category === 'Replication' && '🔄'}
-                    {category === 'Performance' && '⚡'}
-                    {category === 'Security' && '🔐'}
-                    {category === 'Transactions' && '💳'}
-                    {category === 'Schema Design' && '🎨'}
-                  </div>
-                  <h3 className="font-semibold text-green-800">{category}</h3>
-                  <p className="text-sm text-gray-600">
-                    {interviewQuestions.filter(q => q.category === category).length} questions
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        
 
         {/* Questions */}
         <div className="space-y-6">

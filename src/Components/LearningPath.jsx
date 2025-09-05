@@ -119,20 +119,13 @@ const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartM
     },
     {
       id: 10,
-      title: "Interview Questions",
-      description: "Expert-level MongoDB interview prep",
+      title: "Mongo DB Expert ",
+      description: "Test Yourself with interview Questions",
       type: "checkpoint",
       questions: 10,
       xp: 150
     },
-    {
-      id: 11,
-      title: "MongoDB Expert",
-      description: "Complete your MongoDB journey!",
-      type: "end",
-      questions: 0,
-      xp: 200
-    }
+    
   ];
 
   const handleCheckpointClick = (checkpointId) => {
