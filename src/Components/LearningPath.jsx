@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import BearMascot from './BearMascot';
 
-const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartModule4, onStartModule5, onStartModule6, onStartTask1, onStartTask2, onStartInstallation, completedModules }) => {
+const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartModule4, onStartModule5, onStartModule6, onStartModule7, onStartModule8, onStartTask1, onStartTask2, onStartInstallation, completedModules }) => {
   const [completedCheckpoints, setCompletedCheckpoints] = useState(completedModules?.map(m => m.id) || []);
   const [currentCheckpoint, setCurrentCheckpoint] = useState(() => {
     // If no modules completed, start with checkpoint 0
@@ -106,7 +106,7 @@ const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartM
       title: "Indexing",
       description: "Optimizing query performance",
       type: "checkpoint",
-      questions: 4,
+      questions: 8,
       xp: 90
     },
     {
@@ -119,6 +119,14 @@ const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartM
     },
     {
       id: 10,
+      title: "Interview Questions",
+      description: "Expert-level MongoDB interview prep",
+      type: "checkpoint",
+      questions: 10,
+      xp: 150
+    },
+    {
+      id: 11,
       title: "MongoDB Expert",
       description: "Complete your MongoDB journey!",
       type: "end",
@@ -152,6 +160,10 @@ const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartM
         onStartModule5();
       } else if (checkpointId === 8) {
         onStartModule6();
+      } else if (checkpointId === 9) {
+        onStartModule7();
+      } else if (checkpointId === 10) {
+        onStartModule8();
       }
       // Add more module navigation here for other checkpoints
     //}

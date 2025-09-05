@@ -13,13 +13,15 @@ import Module3 from "./Components/Module/Module3"
 import Module4 from "./Components/Module/Module4"
 import Module5 from "./Components/Module/Module5"
 import Module6 from "./Components/Module/Module6"
+import Module7 from "./Components/Module/Module7"
+import Module8 from "./Components/Module/Module8"
 import Installation from "./Components/Module/Installation"
 import Task1 from "./Components/Task/Task1"
 import Taskk2 from "./Components/Task/Taskk2"
 import FloatingBear from './Components/FloatingBear';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('home'); // 'home', 'learning', 'login', 'signup', 'module1', 'module2', 'module3', 'module4', 'module5', 'module6', 'installation', 'task1', 'task2'
+  const [currentPage, setCurrentPage] = useState('home'); // 'home', 'learning', 'login', 'signup', 'module1', 'module2', 'module3', 'module4', 'module5', 'module6', 'module7', 'module8', 'installation', 'task1', 'task2'
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -33,7 +35,7 @@ function App() {
   }, []);
 
   const handleStartLearning = () => {
-    setCurrentPage('login');
+    setCurrentPage('signup');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -116,6 +118,16 @@ function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleStartModule7 = () => {
+    setCurrentPage('module7');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleStartModule8 = () => {
+    setCurrentPage('module8');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleStartTask1 = () => {
     setCurrentPage('task1');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -159,7 +171,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation - Hide on auth pages and modules */}
-      {currentPage !== 'login' && currentPage !== 'signup' && currentPage !== 'module1' && currentPage !== 'module2' && currentPage !== 'module3' && currentPage !== 'module4' && currentPage !== 'module5' && currentPage !== 'module6' && currentPage !== 'installation' && currentPage !== 'task1' && currentPage !== 'task2' && (
+      {currentPage !== 'login' && currentPage !== 'signup' && currentPage !== 'module1' && currentPage !== 'module2' && currentPage !== 'module3' && currentPage !== 'module4' && currentPage !== 'module5' && currentPage !== 'module6' && currentPage !== 'module7' && currentPage !== 'module8' && currentPage !== 'installation' && currentPage !== 'task1' && currentPage !== 'task2' && (
         <Navbar 
           user={user} 
           onLogout={handleLogout} 
@@ -210,6 +222,8 @@ function App() {
             onStartModule4={handleStartModule4}
             onStartModule5={handleStartModule5}
             onStartModule6={handleStartModule6}
+            onStartModule7={handleStartModule7}
+            onStartModule8={handleStartModule8}
             onStartTask1={handleStartTask1}
             onStartTask2={handleStartTask2}
             onStartInstallation={handleStartInstallation}
@@ -260,6 +274,20 @@ function App() {
         />
       )}
 
+      {currentPage === 'module7' && (
+        <Module7 
+          onBackToPath={handleBackToPath}
+          onModuleComplete={handleModuleComplete}
+        />
+      )}
+
+      {currentPage === 'module8' && (
+        <Module8 
+          onBackToPath={handleBackToPath}
+          onModuleComplete={handleModuleComplete}
+        />
+      )}
+
       {currentPage === 'task1' && (
         <Task1 
           onBackToPath={handleBackToPath}
@@ -282,10 +310,10 @@ function App() {
       )}
 
       {/* Footer - Hide on auth pages and modules */}
-      {currentPage !== 'login' && currentPage !== 'signup' && currentPage !== 'module1' && currentPage !== 'module2' && currentPage !== 'module3' && currentPage !== 'module4' && currentPage !== 'module5' && currentPage !== 'module6' && currentPage !== 'installation' && currentPage !== 'task1' && currentPage !== 'task2' && <Footer />}
+      {currentPage !== 'login' && currentPage !== 'signup' && currentPage !== 'module1' && currentPage !== 'module2' && currentPage !== 'module3' && currentPage !== 'module4' && currentPage !== 'module5' && currentPage !== 'module6' && currentPage !== 'module7' && currentPage !== 'module8' && currentPage !== 'installation' && currentPage !== 'task1' && currentPage !== 'task2' && <Footer />}
 
       {/* Floating Bear Mascot - Hide on auth pages and modules */}
-      {currentPage !== 'login' && currentPage !== 'signup' && currentPage !== 'module1' && currentPage !== 'module2' && currentPage !== 'module3' && currentPage !== 'module4' && currentPage !== 'module5' && currentPage !== 'module6' && currentPage !== 'installation' && currentPage !== 'task1' && currentPage !== 'task2' && (
+      {currentPage !== 'login' && currentPage !== 'signup' && currentPage !== 'module1' && currentPage !== 'module2' && currentPage !== 'module3' && currentPage !== 'module4' && currentPage !== 'module5' && currentPage !== 'module6' && currentPage !== 'module7' && currentPage !== 'module8' && currentPage !== 'installation' && currentPage !== 'task1' && currentPage !== 'task2' && (
         <div className="fixed bottom-4 right-4 z-50">
           {/* <BearMascot size="80px" /> */}
           {/* <FloatingBear></FloatingBear> */}
