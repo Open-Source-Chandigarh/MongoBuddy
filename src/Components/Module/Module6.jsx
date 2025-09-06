@@ -119,6 +119,8 @@ const Module6 = ({ onBackToPath, onModuleComplete }) => {
           "Database indexes are data structures that improve the speed of data retrieval operations.",
           "Indexes create shortcuts to find documents quickly without scanning entire collections.",
           "They work similarly to book indexes, pointing to specific locations of data.",
+          "Without an index → You have to read the entire book page by page to find something (full collection scan)",
+          "With an index → You flip to the table of contents or the index at the back, and jump straight to the right page (indexed search).",
           "MongoDB automatically creates an index on the _id field for every collection.",
           "Proper indexing is crucial for application performance as data grows."
         ]
@@ -154,42 +156,81 @@ const Module6 = ({ onBackToPath, onModuleComplete }) => {
           "• Follow the ESR rule: Equality, Sort, Range for optimal field ordering",
           "• Can support queries on any prefix of the indexed fields",
           "• Example: Index on {status: 1, date: -1} supports queries on status or status+date"
-        ]
+        ],
+           code:`// Example collection Students
+ [
+  { name: "Aman", age: 21, grade: "A" },
+  { name: "Aman", age: 19, grade: "B" },
+  { name: "Bina", age: 20, grade: "A" },
+  { name: "Chirag", age: 21, grade: "C" },
+  { name: "Chirag", age: 22, grade: "B" }
+]
+  //Single Field Index
+  db.students.createIndex({name:1}) //1 means ascending order -1 means descending
+
+  //Compound Index
+  db.students.createIndex({name:1,age:-1})
+`
+       
       },
       {
         title: "5. Index Types and Specializations",
         content: [
-          "• Text Indexes: For full-text search with db.collection.createIndex({ title: 'text' })",
-          "• Geospatial Indexes: For location-based queries with 2dsphere or 2d indexes",
+          "• Text Indexes: For full-text search with db.collection.createIndex({ title: 'text' })",   
           "• Sparse Indexes: Only index documents that contain the indexed field",
           "• Partial Indexes: Index only documents that meet specified criteria",
-          "• TTL Indexes: Automatically delete documents after a specified time period",
           "• Unique Indexes: Ensure field values are unique across the collection"
-        ]
+        ],
+           code:`
+// Example Collection Articles 
+db.articles.insertMany([
+  { title: "Introduction to MongoDB", body: "MongoDB is a NoSQL database that stores data in JSON-like documents.",author:"Alice" },
+  { title: "Learning Python", body: "Python is a versatile language used in AI, web development, and data science." },
+  { title: "AI with MongoDB", body: "MongoDB can be used to store and process AI datasets efficiently.",author:"Bob" },
+  { title: "Machine Learning Basics", body: "Machine learning is a subset of AI with algorithms for prediction and classification." }
+])
+  // Text Index
+  db.articles.createIndex({ title: "text", body: "text" })  //Mongo DB indexes all the words inside text and body for fast searches 
+
+  //find 
+  db.articles.find({ $text: { $search: "MongoDB" } })
+
+  //Output: Returns docs where either the title or body contains “MongoDB”.
+  //"Introduction to MongoDB"
+  //"AI with MongoDB"
+
+
+  //Sparse Index
+  db.articles.createIndex({ author: 1 }, { sparse: true }) 
+
+  //Output: Returns only those docs where the specified field is present
+
+  // Partial Index  
+  db.articles.createIndex(
+  { author: 1 },
+  { partialFilterExpression: { author: { $exists: true, $ne: "Guest" } } }
+
+  //Unique index
+  db.articles.createIndex({ author: 1 }, { unique: true })
+)
+`
+
+
+
       },
+     
       {
-        title: "6. Index Performance Analysis",
-        content: [
-          "• Use explain() to analyze query execution plans and performance",
-          "• explain('executionStats') provides detailed timing and document examination data",
-          "• Key metrics: totalDocsExamined, totalDocsReturned, executionTimeMillis",
-          "• IXSCAN indicates index usage, COLLSCAN indicates full collection scan",
-          "• Use MongoDB Profiler to identify slow queries automatically"
-        ]
-      },
-      {
-        title: "7. Index Creation Strategies",
+        title: "6. Index Creation Strategies",
         content: [
           "• Analyze query patterns before creating indexes",
           "• Create indexes for frequently executed queries first",
           "• Use compound indexes for multi-field queries",
-          "• Consider query selectivity - fields with high cardinality are better candidates",
           "• Background index creation (background: true) prevents blocking operations",
           "• Test index effectiveness with explain() before and after creation"
         ]
       },
       {
-        title: "8. Index Maintenance and Management",
+        title: "7. Index Maintenance and Management",
         content: [
           "• View existing indexes: db.collection.getIndexes()",
           "• Drop unused indexes: db.collection.dropIndex('indexName')",
@@ -198,7 +239,7 @@ const Module6 = ({ onBackToPath, onModuleComplete }) => {
         ]
       },
       {
-        title: "9. Index Limitations and Trade-offs",
+        title: "8. Index Limitations and Trade-offs",
         content: [
           "• Indexes consume additional storage space and memory",
           "• Write operations (insert, update, delete) become slower with more indexes",
@@ -215,10 +256,10 @@ const Module6 = ({ onBackToPath, onModuleComplete }) => {
           "• Use the ESR (Equality, Sort, Range) rule for compound index field ordering",
           "• Avoid over-indexing - only create indexes that provide significant value",
           "• Monitor and remove unused indexes to improve write performance",
-          "• Use hint() to force specific index usage for testing",
           "• Consider partial indexes for queries with consistent filter conditions",
           "• Plan index strategy during application design phase"
-        ]
+        ],
+      
       }
     ]
   };
@@ -324,6 +365,18 @@ const Module6 = ({ onBackToPath, onModuleComplete }) => {
                       </li>
                     ))}
                   </ul>
+                  
+                  {/* Display code block if it exists */}
+                  {section.code && (
+                    <div className="mt-6">
+                      <h4 className="text-lg font-semibold text-gray-800 mb-3"> Example:</h4>
+                      <div className="bg-gray-900 rounded-lg p-4 overflow-x-auto">
+                        <pre className="text-green-400 text-sm leading-relaxed">
+                          <code>{section.code}</code>
+                        </pre>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
