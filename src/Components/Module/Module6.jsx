@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import BearMascot from '../BearMascot';
+import { Calculator } from 'lucide-react';
+import axios from 'axios';
 
 const Module6 = ({ onBackToPath, onModuleComplete }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -302,8 +304,34 @@ db.articles.insertMany([
   };
 
   const handleCompleteModule = () => {
+    const progressData={
+      moduleId:'module6',
+      score:score,
+      completedAt:new Date().toISOString(),
+      passed: score>=(questions.length*0.7)
+
+    }
+    saveUserProgress(progressData);
     onModuleComplete('module6', score);
   };
+
+  async function saveUserProgress(data) {
+    let url= "http://localhost:2001/saveData";
+
+    try{
+      const resp=await axios.post(url,data);
+
+      if(resp.data.status==true){
+        alert("Saved progress");
+      }
+      else{
+        alert("error");
+      }
+    }
+    catch(err){
+      console.log(err.message);
+    }
+  }
 
   const resetQuiz = () => {
     setCurrentQuestion(0);
