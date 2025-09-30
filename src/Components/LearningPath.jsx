@@ -1,14 +1,22 @@
 import React, { useState } from 'react';
 import BearMascot from './BearMascot';
 
-const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartModule4, onStartModule5, onStartModule6, onStartModule7, onStartModule8, onStartTask1, onStartTask2, onStartInstallation, completedModules }) => {
-  const [completedCheckpoints, setCompletedCheckpoints] = useState(completedModules?.map(m => m.id) || []);
+const LearningPath = ({ onModuleSelect, completedModules, onBackToHome, user, onLogout }) => {
+  const [completedCheckpoints, setCompletedCheckpoints] = useState(completedModules || []);
   const [currentCheckpoint, setCurrentCheckpoint] = useState(() => {
     // If no modules completed, start with checkpoint 0
     // Otherwise, start with the next checkpoint after the last completed one
-    const completed = completedModules?.map(m => m.id) || [];
-    return completed.length;
+    return completedModules?.length || 0;
   });
+
+  // Function to check if a module is unlocked (accessible)
+  const isModuleUnlocked = (checkpointId) => {
+    // First module (checkpoint 0) is always unlocked
+    if (checkpointId === 0) return true;
+    
+    // Module is unlocked if the previous module is completed
+    return completedCheckpoints.includes(checkpointId - 1);
+  };
 
   // Function to mark a checkpoint as completed
   const markCheckpointAsCompleted = (checkpointId) => {
@@ -17,7 +25,7 @@ const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartM
       setCompletedCheckpoints(newCompletedCheckpoints);
       
       // Update current checkpoint to the next available one
-      const nextCheckpoint = Math.max(...newCompletedCheckpoints)+1;
+      const nextCheckpoint = Math.max(...newCompletedCheckpoints) + 1;
       setCurrentCheckpoint(nextCheckpoint);
     }
   };
@@ -129,59 +137,66 @@ const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartM
   ];
 
   const handleCheckpointClick = (checkpointId) => {
-   // if (checkpointId <= currentCheckpoint) {
-      // Allow access to current and completed checkpoints
-      console.log(`Starting checkpoint: ${checkpoints[checkpointId].title}`);
-      
-      // Navigate to specific modules
-      if (checkpointId === 0) {
-        onStartModule1();
-      } else if (checkpointId === 1) {
-        onStartModule2();
-      } else if (checkpointId === 2) {
-        onStartTask1();
-      } else if (checkpointId === 3) {
-       onStartInstallation();
-      } else if (checkpointId === 4) {
-       onStartModule3();
-      } else if (checkpointId === 5) {
-        //onStartInstallation();
-         onStartTask2();
-      } else if (checkpointId === 6) {
-        onStartModule4();
-      } else if (checkpointId === 7) {
-        onStartModule5();
-      } else if (checkpointId === 8) {
-        onStartModule6();
-      } else if (checkpointId === 9) {
-        onStartModule7();
-      } else if (checkpointId === 10) {
-        onStartModule8();
-      }
-      // Add more module navigation here for other checkpoints
-    //}
+    // Check if the module is unlocked
+    if (!isModuleUnlocked(checkpointId)) {
+      console.log('Module is locked. Complete previous modules first.');
+      return;
+    }
+
+    // Allow access to unlocked checkpoints
+    console.log(`Starting checkpoint: ${checkpoints[checkpointId].title}`);
+    
+    // Navigate to specific modules using the onModuleSelect prop
+    if (checkpointId === 0) {
+      onModuleSelect('module1');
+    } else if (checkpointId === 1) {
+      onModuleSelect('module2');
+    } else if (checkpointId === 2) {
+      onModuleSelect('task1');
+    } else if (checkpointId === 3) {
+      onModuleSelect('installation');
+    } else if (checkpointId === 4) {
+      onModuleSelect('module3');
+    } else if (checkpointId === 5) {
+      onModuleSelect('task2');
+    } else if (checkpointId === 6) {
+      onModuleSelect('module4');
+    } else if (checkpointId === 7) {
+      onModuleSelect('module5');
+    } else if (checkpointId === 8) {
+      onModuleSelect('module6');
+    } else if (checkpointId === 9) {
+      onModuleSelect('module7');
+    } else if (checkpointId === 10) {
+      onModuleSelect('module8');
+    }
   };
 
   const getCheckpointStatus = (checkpointId) => {
     if (completedCheckpoints.includes(checkpointId)) return 'completed';
-    if (checkpointId === currentCheckpoint) return 'current';
-    if (checkpointId < currentCheckpoint) return 'available';
-    return 'available ';
+    if (isModuleUnlocked(checkpointId)) return 'available';
+    return 'locked';
   };
 
   const getCheckpointColor = (checkpoint) => {
     const status = getCheckpointStatus(checkpoint.id);
     
-    if (checkpoint.type === 'start') return 'bg-green-500';
-    if (checkpoint.type === 'end') return 'bg-red-500';
-    if (checkpoint.type === 'task') return 'bg-purple-500';
-    if (checkpoint.type === 'installation') return 'bg-blue-500';
-    
     switch (status) {
-      case 'completed': return 'bg-yellow-500';
-      case 'current': return 'bg-blue-500';
-      case 'available': return 'bg-yellow-400';
-      default: return 'bg-gray-400';
+      case 'completed': 
+        if (checkpoint.type === 'start') return 'bg-green-500';
+        if (checkpoint.type === 'end') return 'bg-red-500';
+        if (checkpoint.type === 'task') return 'bg-purple-500';
+        if (checkpoint.type === 'installation') return 'bg-blue-500';
+        return 'bg-yellow-500';
+      case 'available': 
+        if (checkpoint.type === 'start') return 'bg-green-400';
+        if (checkpoint.type === 'end') return 'bg-red-400';
+        if (checkpoint.type === 'task') return 'bg-purple-400';
+        if (checkpoint.type === 'installation') return 'bg-blue-400';
+        return 'bg-yellow-400';
+      case 'locked':
+      default: 
+        return 'bg-gray-400 opacity-50';
     }
   };
 
@@ -265,6 +280,15 @@ const LearningPath = ({ onStartModule1, onStartModule2, onStartModule3, onStartM
                       }
                     `}
                   >
+                    
+                    {/* Lock Icon for Locked Modules */}
+                    {getCheckpointStatus(checkpoint.id) === 'locked' && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <svg className="w-8 h-8 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    )}
                     
                     {/* Checkpoint Content */}
                     {checkpoint.type === 'start' && (

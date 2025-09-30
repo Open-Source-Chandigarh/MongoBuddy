@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import BearMascot from '../BearMascot';
 import { Calculator } from 'lucide-react';
-import axios from 'axios';
+import { useAuth } from '../../contexts/AuthContext';
+import SupabaseProgressService from '../../services/supabaseProgressService';
 
 const Module6 = ({ onBackToPath, onModuleComplete }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -9,6 +10,15 @@ const Module6 = ({ onBackToPath, onModuleComplete }) => {
   const [showResults, setShowResults] = useState(false);
   const [score, setScore] = useState(0);
   const [showTheory, setShowTheory] = useState(true); // Start with theory
+  const [startTime, setStartTime] = useState(null);
+  const [saving, setSaving] = useState(false);
+  
+  const { user, isAuthenticated } = useAuth();
+
+  // Start tracking time when component mounts
+  useEffect(() => {
+    setStartTime(Date.now());
+  }, []);
 
   // Quiz questions based on MongoDB Indexing
   const questions = [
@@ -303,35 +313,40 @@ db.articles.insertMany([
     }
   };
 
-  const handleCompleteModule = () => {
-    const progressData={
-      moduleId:'module6',
-      score:score,
-      completedAt:new Date().toISOString(),
-      passed: score>=(questions.length*0.7)
-
+  const handleCompleteModule = async () => {
+    if (!isAuthenticated || !user) {
+      alert('Please log in to save your progress');
+      onModuleComplete('module6', score);
+      return;
     }
-    saveUserProgress(progressData);
+
+    setSaving(true);
+    
+    try {
+      const result = await SupabaseProgressService.saveModuleProgress({
+        userId: user.id,
+        email: user.email,
+        moduleId: 'module6',
+        score: score,
+        totalQuestions: questions.length,
+        startTime: startTime
+      });
+
+      if (result.success) {
+        alert('Progress saved successfully! 🎉');
+      } else {
+        console.error('Failed to save progress:', result.error);
+        alert('Failed to save progress. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error saving progress:', error);
+      alert('An error occurred while saving progress.');
+    } finally {
+      setSaving(false);
+    }
+    
     onModuleComplete('module6', score);
   };
-
-  async function saveUserProgress(data) {
-    let url= "http://localhost:2001/saveData";
-
-    try{
-      const resp=await axios.post(url,data);
-
-      if(resp.data.status==true){
-        alert("Saved progress");
-      }
-      else{
-        alert("error");
-      }
-    }
-    catch(err){
-      console.log(err.message);
-    }
-  }
 
   const resetQuiz = () => {
     setCurrentQuestion(0);
@@ -533,9 +548,14 @@ db.articles.insertMany([
                 {passed && (
                   <button
                     onClick={handleCompleteModule}
-                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    disabled={saving}
+                    className={`px-6 py-3 rounded-lg transition-colors ${
+                      saving 
+                        ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
+                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                    }`}
                   >
-                    ✅ Complete Module
+                    {saving ? '💾 Saving Progress...' : '✅ Complete Module'}
                   </button>
                 )}
                 

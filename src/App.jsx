@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Features from "./Components/Index page/Features"
 import Footer from "./Components/Index page/Footer"
 import Navbar from "./Components/Index page/Navbar"
@@ -19,23 +19,106 @@ import Installation from "./Components/Module/Installation"
 import Task1 from "./Components/Task/Task1"
 import Taskk2 from "./Components/Task/Taskk2"
 import FloatingBear from './Components/FloatingBear';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import AuthForm from './components/Auth/AuthForm';
+import AuthDebug from './components/AuthDebug';
+import { SupabaseProgressService } from './services/supabaseProgressService';
 
-function App() {
-  const [currentPage, setCurrentPage] = useState('home'); // 'home', 'learning', 'login', 'signup', 'module1', 'module2', 'module3', 'module4', 'module5', 'module6', 'module7', 'module8', 'installation', 'task1', 'task2'
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
+// Inner App component that has access to auth context
+function AppContent() {
+  const [currentPage, setCurrentPage] = useState('home'); // 'home', 'learning', 'auth', 'module1', 'module2', 'module3', 'module4', 'module5', 'module6', 'module7', 'module8', 'installation', 'task1', 'task2'
   const [completedModules, setCompletedModules] = useState([]);
+  
+  const { user, isAuthenticated, loading, signOut } = useAuth();
 
-  // No authentication check needed - starting with no authentication
+  // Load user progress when authenticated
   useEffect(() => {
-    setIsAuthenticated(false);
-    setUser(null);
-    setLoading(false);
-  }, []);
+    if (isAuthenticated && user) {
+      loadUserProgress();
+    } else {
+      setCompletedModules([]);
+    }
+  }, [isAuthenticated, user]);
+
+  // Helper function to convert module names to checkpoint IDs
+  const getModuleIdFromName = (moduleName) => {
+    const moduleMap = {
+      'module1': 0,
+      'module2': 1,
+      'task1': 2,
+      'installation': 3,
+      'module3': 4,
+      'task2': 5,
+      'module4': 6,
+      'module5': 7,
+      'module6': 8,
+      'module7': 9,
+      'module8': 10
+    };
+    return moduleMap[moduleName] !== undefined ? moduleMap[moduleName] : moduleName;
+  };
+
+  // Helper function to convert checkpoint IDs to module names
+  const getModuleNameFromId = (checkpointId) => {
+    const idMap = {
+      0: 'module1',
+      1: 'module2',
+      2: 'task1',
+      3: 'installation',
+      4: 'module3',
+      5: 'task2',
+      6: 'module4',
+      7: 'module5',
+      8: 'module6',
+      9: 'module7',
+      10: 'module8'
+    };
+    return idMap[checkpointId] || `module${checkpointId}`;
+  };
+
+  // Function to load user's completed modules from Supabase
+  const loadUserProgress = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      const progress = await SupabaseProgressService.getUserProgress(user.id);
+      const completedModuleIds = progress
+        .filter(p => p.passed)
+        .map(p => getModuleIdFromName(p.module_id));
+      
+      setCompletedModules(completedModuleIds);
+      console.log('Loaded user progress:', completedModuleIds);
+    } catch (error) {
+      console.error('Error loading user progress:', error);
+    }
+  }, [user]);
+
+  // Auto-redirect to learning path when user signs in while on auth page
+  useEffect(() => {
+    console.log('Auth state changed:', { 
+      isAuthenticated, 
+      currentPage, 
+      userEmail: user?.email,
+      loading 
+    });
+    
+    // Only redirect if we're not loading and user is authenticated and on auth page
+    if (!loading && isAuthenticated && currentPage === 'auth') {
+      console.log('Redirecting to learning path...');
+      // Use a small delay to ensure state has fully updated
+      setTimeout(() => {
+        setCurrentPage('learning');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 100);
+    }
+  }, [isAuthenticated, currentPage, loading, user]);
 
   const handleStartLearning = () => {
-    setCurrentPage('signup');
+    if (isAuthenticated) {
+      setCurrentPage('learning');
+    } else {
+      setCurrentPage('auth');
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -49,279 +132,160 @@ function App() {
       setCurrentPage('learning');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-      setCurrentPage('login');
+      setCurrentPage('auth');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
-  const handleLoginSuccess = (userData) => {
-    setIsAuthenticated(true);
-    setUser(userData);
+  const handleLogin = (userData) => {
     setCurrentPage('learning');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleSignupSuccess = (userData) => {
-    setIsAuthenticated(true);
-    setUser(userData);
+  const handleSignup = (userData) => {
     setCurrentPage('learning');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleSwitchToLogin = () => {
-    setCurrentPage('login');
-  };
-
-  const handleSwitchToSignup = () => {
-    setCurrentPage('signup');
   };
 
   const handleLogout = () => {
-    // TODO: Replace with your authentication logout API call
-    setIsAuthenticated(false);
-    setUser(null);
+    signOut();
     setCurrentPage('home');
-  };
-
-  const handleGetStarted = () => {
-    setCurrentPage('signup');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleStartModule1 = () => {
-    setCurrentPage('module1');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+  const completeModule = async (moduleNumber, score = null, totalQuestions = null) => {
+    if (!completedModules.includes(moduleNumber)) {
+      // Update local state immediately
+      const newCompletedModules = [...completedModules, moduleNumber];
+      setCompletedModules(newCompletedModules);
 
-  const handleStartModule2 = () => {
-    setCurrentPage('module2');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleStartModule3 = () => {
-    setCurrentPage('module3');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleStartModule4 = () => {
-    setCurrentPage('module4');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleStartModule5 = () => {
-    setCurrentPage('module5');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleStartModule6 = () => {
-    setCurrentPage('module6');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleStartModule7 = () => {
-    setCurrentPage('module7');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleStartModule8 = () => {
-    setCurrentPage('module8');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleStartTask1 = () => {
-    setCurrentPage('task1');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleStartTask2 = () => {
-    setCurrentPage('task2');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleStartInstallation = () => {
-    setCurrentPage('installation');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleModuleComplete = (moduleId, score) => {
-    setCompletedModules(prev => [...prev, { id: moduleId, score }]);
-    
-    // Mark the corresponding checkpoint as completed
-    if (window.learningPathHelpers && window.learningPathHelpers.markCheckpointAsCompleted) {
-      window.learningPathHelpers.markCheckpointAsCompleted(moduleId);
+      // Save to Supabase if user is authenticated
+      if (isAuthenticated && user && score !== null && totalQuestions !== null) {
+        try {
+          const moduleName = getModuleNameFromId(moduleNumber);
+          await SupabaseProgressService.saveModuleProgress({
+            userId: user.id,
+            email: user.email,
+            moduleId: moduleName,
+            score: score,
+            totalQuestions: totalQuestions,
+            timeSpent: 0 // Will be calculated by service if startTime provided
+          });
+          console.log(`Progress saved for ${moduleName}: ${score}/${totalQuestions}`);
+        } catch (error) {
+          console.error('Error saving module progress:', error);
+          // Note: We don't revert local state as the user did complete the module
+        }
+      }
     }
   };
 
-  const handleBackToPath = () => {
-    setCurrentPage('learning');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <BearMascot size="100px" />
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navigation - Hide on auth pages and modules */}
-      {currentPage !== 'login' && currentPage !== 'signup' && currentPage !== 'module1' && currentPage !== 'module2' && currentPage !== 'module3' && currentPage !== 'module4' && currentPage !== 'module5' && currentPage !== 'module6' && currentPage !== 'module7' && currentPage !== 'module8' && currentPage !== 'installation' && currentPage !== 'task1' && currentPage !== 'task2' && (
-        <Navbar 
-          user={user} 
-          onLogout={handleLogout} 
-          onGetStarted={handleGetStarted}
-          onGoHome={handleBackToHome}
-          onGoToModules={handleGoToModules}
-        />
-      )}
+    <div className="App bg-gray-50">
+      {/* Navigation */}
+      {currentPage !== 'module1' && currentPage !== 'module2' && currentPage !== 'module3' && currentPage !== 'module4' && currentPage !== 'module5' && currentPage !== 'module6' && currentPage !== 'module7' && currentPage !== 'module8' && currentPage !== 'installation' && currentPage !== 'task1' && currentPage !== 'task2' && <Navbar 
+        currentPage={currentPage} 
+        onBackToHome={handleBackToHome}
+        onGoToModules={handleGoToModules}
+        onLogin={() => setCurrentPage('auth')}
+        onLogout={handleLogout}
+        isAuthenticated={isAuthenticated}
+        user={user}
+      />}
 
       {/* Page Rendering */}
       {currentPage === 'home' && (
         <Home onStartLearning={handleStartLearning} />
       )}
 
-      {currentPage === 'signup' && (
-        <Signup 
-          onSwitchToLogin={handleSwitchToLogin}
-          onSignupSuccess={handleSignupSuccess}
-          onBackToHome={handleBackToHome}
-        />
-      )}
-
-      {currentPage === 'login' && (
-        <Login 
-          onLoginSuccess={handleLoginSuccess}
-          onBackToHome={handleBackToHome}
-          onSwitchToSignup={handleSwitchToSignup}
-        />
+      {currentPage === 'auth' && (
+        <AuthForm onAuthSuccess={() => {
+          console.log('onAuthSuccess callback triggered');
+          setCurrentPage('learning');
+        }} />
       )}
 
       {currentPage === 'learning' && (
         <div>
-          {/* Back to Home Button */}
-          <div className="p-4">
-            <button 
-              onClick={handleBackToHome}
-              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-            >
-              ← Back to Home
-            </button>
-          </div>
-          
-          {/* Learning Path - Interactive Quiz Checkpoints */}
-          <LearningPath 
-            onStartModule1={handleStartModule1}
-            onStartModule2={handleStartModule2}
-            onStartModule3={handleStartModule3}
-            onStartModule4={handleStartModule4}
-            onStartModule5={handleStartModule5}
-            onStartModule6={handleStartModule6}
-            onStartModule7={handleStartModule7}
-            onStartModule8={handleStartModule8}
-            onStartTask1={handleStartTask1}
-            onStartTask2={handleStartTask2}
-            onStartInstallation={handleStartInstallation}
-            completedModules={completedModules}
-          />
+          {/* Check authentication before showing learning path */}
+          {!isAuthenticated ? (
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
+              <div className="text-center bg-white p-8 rounded-xl shadow-lg">
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">Please Sign In</h2>
+                <p className="text-gray-600 mb-6">You need to sign in to access the learning path.</p>
+                <button 
+                  onClick={() => setCurrentPage('auth')}
+                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Sign In
+                </button>
+              </div>
+            </div>
+          ) : (
+            <LearningPath 
+              onModuleSelect={(module) => setCurrentPage(module)} 
+              completedModules={completedModules}
+              onBackToHome={handleBackToHome}
+              user={user}
+              onLogout={handleLogout}
+            />
+          )}
         </div>
       )}
 
-      {currentPage === 'module1' && (
-        <Module1 
-          onBackToPath={handleBackToPath}
-          onModuleComplete={handleModuleComplete}
+      {currentPage === 'login' && (
+        <Login 
+          onLogin={handleLogin}
+          onBackToHome={handleBackToHome}
+          onSwitchToSignup={() => setCurrentPage('signup')}
         />
       )}
 
-      {currentPage === 'module2' && (
-        <Module2 
-          onBackToPath={handleBackToPath}
-          onModuleComplete={handleModuleComplete}
+      {currentPage === 'signup' && (
+        <Signup 
+          onSignup={handleSignup}
+          onBackToHome={handleBackToHome}
+          onSwitchToLogin={() => setCurrentPage('login')}
         />
       )}
 
-      {currentPage === 'module3' && (
-        <Module3 
-          onBackToPath={handleBackToPath}
-          onModuleComplete={handleModuleComplete}
-        />
-      )}
-
-      {currentPage === 'module4' && (
-        <Module4 
-          onBackToPath={handleBackToPath}
-          onModuleComplete={handleModuleComplete}
-        />
-      )}
-
-      {currentPage === 'module5' && (
-        <Module5 
-          onBackToPath={handleBackToPath}
-          onModuleComplete={handleModuleComplete}
-        />
-      )}
-
-      {currentPage === 'module6' && (
-        <Module6 
-          onBackToPath={handleBackToPath}
-          onModuleComplete={handleModuleComplete}
-        />
-      )}
-
-      {currentPage === 'module7' && (
-        <Module7 
-          onBackToPath={handleBackToPath}
-          onModuleComplete={handleModuleComplete}
-        />
-      )}
-
-      {currentPage === 'module8' && (
-        <Module8 
-          onBackToPath={handleBackToPath}
-          onModuleComplete={handleModuleComplete}
-        />
-      )}
-
-      {currentPage === 'task1' && (
-        <Task1 
-          onBackToPath={handleBackToPath}
-          onTaskComplete={handleModuleComplete}
-        />
-      )}
-
-      {currentPage === 'task2' && (
-        <Taskk2 
-          onBackToPath={handleBackToPath}
-          onTaskComplete={handleModuleComplete}
-        />
-      )}
-
-      {currentPage === 'installation' && (
-        <Installation 
-          onBackToPath={handleBackToPath}
-          onModuleComplete={handleModuleComplete}
-        />
-      )}
+      {/* Module Pages */}
+      {currentPage === 'module1' && <Module1 onComplete={() => completeModule(1)} onBackToLearning={() => setCurrentPage('learning')} />}
+      {currentPage === 'module2' && <Module2 onComplete={() => completeModule(2)} onBackToLearning={() => setCurrentPage('learning')} />}
+      {currentPage === 'module3' && <Module3 onComplete={() => completeModule(3)} onBackToLearning={() => setCurrentPage('learning')} />}
+      {currentPage === 'module4' && <Module4 onComplete={() => completeModule(4)} onBackToLearning={() => setCurrentPage('learning')} />}
+      {currentPage === 'module5' && <Module5 onComplete={() => completeModule(5)} onBackToLearning={() => setCurrentPage('learning')} />}
+      {currentPage === 'module6' && <Module6 onComplete={() => completeModule(6)} onBackToLearning={() => setCurrentPage('learning')} />}
+      {currentPage === 'module7' && <Module7 onComplete={() => completeModule(7)} onBackToLearning={() => setCurrentPage('learning')} />}
+      {currentPage === 'module8' && <Module8 onComplete={() => completeModule(8)} onBackToLearning={() => setCurrentPage('learning')} />}
+      {currentPage === 'installation' && <Installation onComplete={() => completeModule('installation')} onBackToLearning={() => setCurrentPage('learning')} />}
+      {currentPage === 'task1' && <Task1 onComplete={() => completeModule('task1')} onBackToLearning={() => setCurrentPage('learning')} />}
+      {currentPage === 'task2' && <Taskk2 onComplete={() => completeModule('task2')} onBackToLearning={() => setCurrentPage('learning')} />}
 
       {/* Footer - Hide on auth pages and modules */}
-      {currentPage !== 'login' && currentPage !== 'signup' && currentPage !== 'module1' && currentPage !== 'module2' && currentPage !== 'module3' && currentPage !== 'module4' && currentPage !== 'module5' && currentPage !== 'module6' && currentPage !== 'module7' && currentPage !== 'module8' && currentPage !== 'installation' && currentPage !== 'task1' && currentPage !== 'task2' && <Footer />}
+      {currentPage !== 'auth' && currentPage !== 'module1' && currentPage !== 'module2' && currentPage !== 'module3' && currentPage !== 'module4' && currentPage !== 'module5' && currentPage !== 'module6' && currentPage !== 'module7' && currentPage !== 'module8' && currentPage !== 'installation' && currentPage !== 'task1' && currentPage !== 'task2' && <Footer />}
 
       {/* Floating Bear Mascot - Hide on auth pages and modules */}
-      {currentPage !== 'login' && currentPage !== 'signup' && currentPage !== 'module1' && currentPage !== 'module2' && currentPage !== 'module3' && currentPage !== 'module4' && currentPage !== 'module5' && currentPage !== 'module6' && currentPage !== 'module7' && currentPage !== 'module8' && currentPage !== 'installation' && currentPage !== 'task1' && currentPage !== 'task2' && (
+      {currentPage !== 'auth' && currentPage !== 'module1' && currentPage !== 'module2' && currentPage !== 'module3' && currentPage !== 'module4' && currentPage !== 'module5' && currentPage !== 'module6' && currentPage !== 'module7' && currentPage !== 'module8' && currentPage !== 'installation' && currentPage !== 'task1' && currentPage !== 'task2' && (
         <div className="fixed bottom-4 right-4 z-50">
           {/* <BearMascot size="80px" /> */}
           {/* <FloatingBear></FloatingBear> */}
         </div>
-
       )}
+      
+      {/* Auth Debug Component */}
+      {/* <AuthDebug /> */}
     </div>
-  )
+  );
 }
 
-export default App
+// Main App wrapper with AuthProvider
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+}
+
+export default App;
