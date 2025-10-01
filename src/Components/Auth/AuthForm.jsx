@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
 
-const AuthForm = ({ onSwitchToLogin, onAuthSuccess }) => {
+const AuthForm = ({onAuthSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({

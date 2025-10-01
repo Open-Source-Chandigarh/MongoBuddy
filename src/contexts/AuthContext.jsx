@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import { supabase } from '../config/supabase';
 
 const AuthContext = createContext({});
@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }) => {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('user_checkpoints')
         .select('*')
         .eq('user_id', user.id)
@@ -208,43 +208,5 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Custom hook to use auth context
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
-
-// HOC for protected routes
-export const withAuth = (WrappedComponent) => {
-  return (props) => {
-    const { user, loading } = useAuth();
-
-    if (loading) {
-      return (
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        </div>
-      );
-    }
-
-    if (!user) {
-      return (
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Authentication Required
-            </h2>
-            <p className="text-gray-600">
-              Please log in to access this content.
-            </p>
-          </div>
-        </div>
-      );
-    }
-
-    return <WrappedComponent {...props} />;
-  };
-};
+// Remove useAuth and withAuth exports from this file.
+// Move them to a new file, e.g., src/contexts/useAuth.js and src/contexts/withAuth.js.

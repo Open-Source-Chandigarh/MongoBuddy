@@ -158,12 +158,12 @@ function AppContent() {
     }
   };
 
-  const handleLogin = (userData) => {
+  const handleLogin = () => {
     setCurrentPage('learning');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleSignup = (userData) => {
+  const handleSignup = () => {
     setCurrentPage('learning');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };

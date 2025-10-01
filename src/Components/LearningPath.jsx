@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import BearMascot from './BearMascot';
 
-const LearningPath = ({ onModuleSelect, completedModules, onBackToHome, user, onLogout }) => {
+const LearningPath = ({ onModuleSelect, completedModules }) => {
   const [completedCheckpoints, setCompletedCheckpoints] = useState(completedModules || []);
   const [currentCheckpoint, setCurrentCheckpoint] = useState(() => {
     // If no modules completed, start with checkpoint 0
