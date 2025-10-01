@@ -196,9 +196,12 @@ const Module1 = ({ onBackToPath, onModuleComplete }) => {
   const handleComplete = () => {
     const percentage = (score / questions.length) * 100;
     if (percentage >= 80) {
-      onModuleComplete(1, score); // Module 1 completed with score
+      // Pass checkpoint ID (0 for Module1), score, and total questions
+      onModuleComplete(0, score, questions.length);
+    } else {
+      // Still go back to path even if not passed
+      onBackToPath();
     }
-    onBackToPath();
   };
 
   const currentQ = questions[currentQuestion];

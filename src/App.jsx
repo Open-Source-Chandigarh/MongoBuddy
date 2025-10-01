@@ -22,6 +22,7 @@ import FloatingBear from './Components/FloatingBear';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import AuthForm from './components/Auth/AuthForm';
 import AuthDebug from './components/AuthDebug';
+import DebugPanel from './components/DebugPanel';
 import { SupabaseProgressService } from './services/supabaseProgressService';
 
 // Inner App component that has access to auth context
@@ -30,15 +31,6 @@ function AppContent() {
   const [completedModules, setCompletedModules] = useState([]);
   
   const { user, isAuthenticated, loading, signOut } = useAuth();
-
-  // Load user progress when authenticated
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      loadUserProgress();
-    } else {
-      setCompletedModules([]);
-    }
-  }, [isAuthenticated, user]);
 
   // Helper function to convert module names to checkpoint IDs
   const getModuleIdFromName = (moduleName) => {
@@ -78,20 +70,49 @@ function AppContent() {
 
   // Function to load user's completed modules from Supabase
   const loadUserProgress = useCallback(async () => {
+    // console.log("hello");
     if (!user) return;
 
     try {
-      const progress = await SupabaseProgressService.getUserProgress(user.id);
-      const completedModuleIds = progress
-        .filter(p => p.passed)
-        .map(p => getModuleIdFromName(p.module_id));
+      console.log('Loading progress for user:', user.id);
+      const result = await SupabaseProgressService.getUserProgress(user.id);
       
-      setCompletedModules(completedModuleIds);
-      console.log('Loaded user progress:', completedModuleIds);
+      console.log('Progress result:', result);
+      
+      if (result.success && result.data) {
+        // Filter passed modules and convert module_id to checkpoint IDs
+        const completedModuleIds = result.data
+          .filter(p => {
+            console.log('Checking module:', p.module_id, 'passed:', p.passed);
+            return p.passed;
+          })
+          .map(p => {
+            // Convert module name to checkpoint ID
+            const checkpointId = getModuleIdFromName(p.module_id);
+            console.log('Converting:', p.module_id, '->', checkpointId);
+            return checkpointId;
+          });
+        
+        setCompletedModules(completedModuleIds);
+        console.log('Loaded user progress - completed modules:', completedModuleIds);
+      } else {
+        console.error('Failed to load progress:', result.error || result.message);
+        setCompletedModules([]);
+      }
     } catch (error) {
       console.error('Error loading user progress:', error);
+      setCompletedModules([]);
     }
   }, [user]);
+
+  // Load user progress when authenticated
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      loadUserProgress();
+    } else {
+      setCompletedModules([]);
+    }
+  }, [isAuthenticated, user, loadUserProgress]);
 
   // Auto-redirect to learning path when user signs in while on auth page
   useEffect(() => {
@@ -159,10 +180,12 @@ function AppContent() {
       const newCompletedModules = [...completedModules, moduleNumber];
       setCompletedModules(newCompletedModules);
 
-      // Save to Supabase if user is authenticated
+      // Save to Supabase if user is authenticated and we have score data
       if (isAuthenticated && user && score !== null && totalQuestions !== null) {
         try {
           const moduleName = getModuleNameFromId(moduleNumber);
+          
+          // Save module progress
           await SupabaseProgressService.saveModuleProgress({
             userId: user.id,
             email: user.email,
@@ -171,12 +194,30 @@ function AppContent() {
             totalQuestions: totalQuestions,
             timeSpent: 0 // Will be calculated by service if startTime provided
           });
+          
+          // Save checkpoint completion
+          await SupabaseProgressService.saveCheckpointCompletion({
+            userId: user.id,
+            email: user.email,
+            checkpointId: moduleNumber,
+            score: score,
+            totalQuestions: totalQuestions
+          });
+          
           console.log(`Progress saved for ${moduleName}: ${score}/${totalQuestions}`);
+          console.log(`Checkpoint ${moduleNumber} completed and saved`);
+          
         } catch (error) {
-          console.error('Error saving module progress:', error);
+          console.error('Error saving progress:', error);
           // Note: We don't revert local state as the user did complete the module
         }
       }
+      
+      // Auto-redirect to learning path after completion
+      setTimeout(() => {
+        setCurrentPage('learning');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 1000); // Small delay to show completion message
     }
   };
 
@@ -250,14 +291,14 @@ function AppContent() {
       )}
 
       {/* Module Pages */}
-      {currentPage === 'module1' && <Module1 onComplete={() => completeModule(1)} onBackToLearning={() => setCurrentPage('learning')} />}
-      {currentPage === 'module2' && <Module2 onComplete={() => completeModule(2)} onBackToLearning={() => setCurrentPage('learning')} />}
-      {currentPage === 'module3' && <Module3 onComplete={() => completeModule(3)} onBackToLearning={() => setCurrentPage('learning')} />}
-      {currentPage === 'module4' && <Module4 onComplete={() => completeModule(4)} onBackToLearning={() => setCurrentPage('learning')} />}
-      {currentPage === 'module5' && <Module5 onComplete={() => completeModule(5)} onBackToLearning={() => setCurrentPage('learning')} />}
-      {currentPage === 'module6' && <Module6 onComplete={() => completeModule(6)} onBackToLearning={() => setCurrentPage('learning')} />}
-      {currentPage === 'module7' && <Module7 onComplete={() => completeModule(7)} onBackToLearning={() => setCurrentPage('learning')} />}
-      {currentPage === 'module8' && <Module8 onComplete={() => completeModule(8)} onBackToLearning={() => setCurrentPage('learning')} />}
+      {currentPage === 'module1' && <Module1 onModuleComplete={(moduleNumber, score, totalQuestions) => completeModule(moduleNumber || 0, score, totalQuestions)} onBackToPath={() => setCurrentPage('learning')} />}
+      {currentPage === 'module2' && <Module2 onModuleComplete={(moduleNumber, score, totalQuestions) => completeModule(moduleNumber || 1, score, totalQuestions)} onBackToPath={() => setCurrentPage('learning')} />}
+      {currentPage === 'module3' && <Module3 onModuleComplete={(moduleNumber, score, totalQuestions) => completeModule(moduleNumber || 4, score, totalQuestions)} onBackToPath={() => setCurrentPage('learning')} />}
+      {currentPage === 'module4' && <Module4 onModuleComplete={(moduleNumber, score, totalQuestions) => completeModule(moduleNumber || 6, score, totalQuestions)} onBackToPath={() => setCurrentPage('learning')} />}
+      {currentPage === 'module5' && <Module5 onModuleComplete={(moduleNumber, score, totalQuestions) => completeModule(moduleNumber || 7, score, totalQuestions)} onBackToPath={() => setCurrentPage('learning')} />}
+      {currentPage === 'module6' && <Module6 onModuleComplete={(moduleNumber, score, totalQuestions) => completeModule(moduleNumber || 8, score, totalQuestions)} onBackToPath={() => setCurrentPage('learning')} />}
+      {currentPage === 'module7' && <Module7 onModuleComplete={(moduleNumber, score, totalQuestions) => completeModule(moduleNumber || 9, score, totalQuestions)} onBackToPath={() => setCurrentPage('learning')} />}
+      {currentPage === 'module8' && <Module8 onModuleComplete={(moduleNumber, score, totalQuestions) => completeModule(moduleNumber || 10, score, totalQuestions)} onBackToPath={() => setCurrentPage('learning')} />}
       {currentPage === 'installation' && <Installation onComplete={() => completeModule('installation')} onBackToLearning={() => setCurrentPage('learning')} />}
       {currentPage === 'task1' && <Task1 onComplete={() => completeModule('task1')} onBackToLearning={() => setCurrentPage('learning')} />}
       {currentPage === 'task2' && <Taskk2 onComplete={() => completeModule('task2')} onBackToLearning={() => setCurrentPage('learning')} />}

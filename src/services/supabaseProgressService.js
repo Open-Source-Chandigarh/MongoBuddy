@@ -197,6 +197,79 @@ export class SupabaseProgressService {
     }
   }
 
+  // Save checkpoint completion
+  static async saveCheckpointCompletion({
+    userId,
+    email,
+    checkpointId,
+    score,
+    totalQuestions
+  }) {
+    try {
+      if (!userId || checkpointId === undefined) {
+        throw new Error('User ID and Checkpoint ID are required');
+      }
+
+      const passed = score >= Math.ceil(totalQuestions * 0.7); // 70% passing grade
+
+      // Get current checkpoint data
+      const { data: currentCheckpoint, error: fetchError } = await supabase
+        .from('user_checkpoints')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        throw fetchError;
+      }
+
+      // Calculate new values
+      const completedModules = currentCheckpoint?.total_modules_completed || 0;
+      const newCompletedModules = passed ? completedModules + 1 : completedModules;
+      const newCurrentCheckpoint = passed ? checkpointId + 1 : (currentCheckpoint?.current_checkpoint || 0);
+
+      const updateData = {
+        user_id: userId,
+        email: email,
+        current_checkpoint: newCurrentCheckpoint,
+        total_modules_completed: newCompletedModules,
+        last_module_completed: passed ? `module${checkpointId}` : currentCheckpoint?.last_module_completed,
+        last_activity: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      if (currentCheckpoint) {
+        // Update existing record
+        const { error: updateError } = await supabase
+          .from('user_checkpoints')
+          .update(updateData)
+          .eq('user_id', userId);
+
+        if (updateError) throw updateError;
+      } else {
+        // Create new record
+        const { error: insertError } = await supabase
+          .from('user_checkpoints')
+          .insert(updateData);
+
+        if (insertError) throw insertError;
+      }
+
+      return {
+        success: true,
+        message: 'Checkpoint completion saved successfully'
+      };
+
+    } catch (error) {
+      console.error('Error saving checkpoint completion:', error);
+      return {
+        success: false,
+        error: error.message,
+        message: 'Failed to save checkpoint completion'
+      };
+    }
+  }
+
   // Get user checkpoint information
   static async getUserCheckpoint(userId) {
     try {
