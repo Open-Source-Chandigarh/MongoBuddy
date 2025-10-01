@@ -457,6 +457,73 @@ export class SupabaseProgressService {
       };
     }
   }
+
+  // Get complete user data including checkpoints and progress
+  static async getUserCompleteData(userId) {
+    try {
+      if (!userId) {
+        throw new Error('User ID is required');
+      }
+
+      // Fetch both progress and checkpoint data in parallel
+      const [progressResult, checkpointResult] = await Promise.all([
+        this.getUserProgress(userId),
+        this.getUserCheckpoint(userId)
+      ]);
+
+      if (!progressResult.success) {
+        throw new Error(progressResult.error || 'Failed to fetch progress');
+      }
+
+      if (!checkpointResult.success) {
+        throw new Error(checkpointResult.error || 'Failed to fetch checkpoints');
+      }
+
+      // Process progress data to get completed modules
+      const completedModules = progressResult.data
+        .filter(p => p.passed)
+        .map(p => {
+          // Convert module_id to checkpoint number
+          const moduleMap = {
+            'module1': 0,
+            'module2': 1,
+            'task1': 2,
+            'installation': 3,
+            'module3': 4,
+            'task2': 5,
+            'module4': 6,
+            'module5': 7,
+            'module6': 8,
+            'module7': 9,
+            'module8': 10
+          };
+          return moduleMap[p.module_id] !== undefined ? moduleMap[p.module_id] : p.module_id;
+        });
+
+      return {
+        success: true,
+        data: {
+          progress: progressResult.data,
+          checkpoint: checkpointResult.data,
+          completedModules: completedModules,
+          currentCheckpoint: checkpointResult.data.current_checkpoint || 1,
+          totalModulesCompleted: checkpointResult.data.total_modules_completed || 0,
+          totalTimeSpent: checkpointResult.data.total_time_spent || 0,
+          achievements: checkpointResult.data.achievements || [],
+          streakDays: checkpointResult.data.streak_days || 0
+        },
+        message: 'User data retrieved successfully'
+      };
+
+    } catch (error) {
+      console.error('Error fetching complete user data:', error);
+      return {
+        success: false,
+        error: error.message,
+        message: 'Failed to fetch complete user data'
+      };
+    }
+  }
 }
 
 // Export default instance for easier usage

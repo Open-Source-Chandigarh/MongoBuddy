@@ -228,6 +228,7 @@ function AppContent() {
         currentPage={currentPage} 
         onBackToHome={handleBackToHome}
         onGoToModules={handleGoToModules}
+        onGetStarted={handleStartLearning}
         onLogin={() => setCurrentPage('auth')}
         onLogout={handleLogout}
         isAuthenticated={isAuthenticated}

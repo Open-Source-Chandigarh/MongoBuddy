@@ -1,5 +1,6 @@
-import React, { createContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../config/supabase';
+import { SupabaseProgressService } from '../services/supabaseProgressService';
 
 const AuthContext = createContext({});
 
@@ -7,6 +8,48 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [session, setSession] = useState(null);
+  const [userProgress, setUserProgress] = useState(null);
+  const [userCheckpoint, setUserCheckpoint] = useState(null);
+  const [completedModules, setCompletedModules] = useState([]);
+
+  // Function to fetch user progress and checkpoint data
+  const fetchUserData = async (user) => {
+    if (!user) {
+      // Clear data when user logs out
+      setUserProgress(null);
+      setUserCheckpoint(null);
+      setCompletedModules([]);
+      return;
+    }
+
+    try {
+      console.log('Fetching user data for:', user.email);
+      const result = await SupabaseProgressService.getUserCompleteData(user.id);
+      
+      if (result.success) {
+        setUserProgress(result.data.progress);
+        setUserCheckpoint(result.data.checkpoint);
+        setCompletedModules(result.data.completedModules);
+        
+        console.log('User data loaded:', {
+          completedModules: result.data.completedModules,
+          currentCheckpoint: result.data.currentCheckpoint,
+          totalCompleted: result.data.totalModulesCompleted
+        });
+      } else {
+        console.error('Failed to fetch user data:', result.error);
+        // Initialize with defaults
+        setUserProgress([]);
+        setUserCheckpoint({ current_checkpoint: 1, total_modules_completed: 0 });
+        setCompletedModules([]);
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      setUserProgress([]);
+      setUserCheckpoint({ current_checkpoint: 1, total_modules_completed: 0 });
+      setCompletedModules([]);
+    }
+  };
 
   useEffect(() => {
     // Get initial session
@@ -14,6 +57,12 @@ export const AuthProvider = ({ children }) => {
       const { data: { session } } = await supabase.auth.getSession();
       setSession(session);
       setUser(session?.user ?? null);
+      
+      // If user is already signed in, fetch their data
+      if (session?.user) {
+        await fetchUserData(session.user);
+      }
+      
       setLoading(false);
     };
 
@@ -32,8 +81,12 @@ export const AuthProvider = ({ children }) => {
           console.log('User signed in:', session?.user?.email);
           // Initialize user checkpoint record if it doesn't exist
           await initializeUserCheckpoint(session?.user);
+          // Fetch user progress and checkpoint data
+          await fetchUserData(session?.user);
         } else if (event === 'SIGNED_OUT') {
           console.log('User signed out');
+          // Clear user data
+          await fetchUserData(null);
         }
       }
     );
@@ -195,10 +248,17 @@ export const AuthProvider = ({ children }) => {
     resetPassword,
     updatePassword,
     getUserProfile,
+    fetchUserData,
+    // User progress data
+    userProgress,
+    userCheckpoint,
+    completedModules,
     // Helper properties
     isAuthenticated: !!user,
     userEmail: user?.email || '',
-    userId: user?.id || null
+    userId: user?.id || null,
+    currentCheckpoint: userCheckpoint?.current_checkpoint || 1,
+    totalModulesCompleted: userCheckpoint?.total_modules_completed || 0
   };
 
   return (
@@ -208,5 +268,11 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Remove useAuth and withAuth exports from this file.
-// Move them to a new file, e.g., src/contexts/useAuth.js and src/contexts/withAuth.js.
+// Custom hook to use the AuthContext
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
