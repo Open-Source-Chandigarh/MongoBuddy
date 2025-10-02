@@ -239,7 +239,8 @@ const Module5 = ({ onBackToPath, onModuleComplete }) => {
   };
 
   const handleCompleteModule = () => {
-    onModuleComplete('module5', score);
+    // Pass checkpoint ID (7 for Module5 - Queries & Filters), score, and total questions
+    onModuleComplete(7, score, questions.length);
   };
 
   const resetQuiz = () => {
