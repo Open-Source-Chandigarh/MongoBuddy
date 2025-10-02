@@ -1,6 +1,6 @@
 import BearMascot from '../BearMascot';
 
-function Navbar({ user, onLogout, onGetStarted, onGoHome, onGoToModules }){  
+function Navbar({ user, onLogout, onGetStarted, onBackToHome, onGoToModules }){
     return(
   <nav className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -8,7 +8,7 @@ function Navbar({ user, onLogout, onGetStarted, onGoHome, onGoToModules }){
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <button 
-                  onClick={onGoHome}
+                  onClick={onBackToHome}
                   className="flex items-center space-x-2 hover:opacity-80 transition-opacity cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 rounded-lg p-1"
                   aria-label="Go to home page"
                 >
@@ -21,7 +21,7 @@ function Navbar({ user, onLogout, onGetStarted, onGoHome, onGoToModules }){
             </div>
             <div className="hidden md:flex items-center space-x-8">
               <button 
-                onClick={onGoHome}
+                onClick={onBackToHome}
                 className="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium cursor-pointer"
               >
                 Home
