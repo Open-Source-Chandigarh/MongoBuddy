@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import Features from "./Components/Index page/Features"
 import Footer from "./Components/Index page/Footer"
 import Navbar from "./Components/Index page/Navbar"
@@ -20,35 +20,24 @@ import Task1 from "./Components/Task/Task1"
 import Taskk2 from "./Components/Task/Taskk2"
 import FloatingBear from './Components/FloatingBear';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import AuthForm from './components/Auth/AuthForm';
-import AuthDebug from './components/AuthDebug';
-import DebugPanel from './components/DebugPanel';
+import AuthForm from '@/Components/Auth/AuthForm';
 import { SupabaseProgressService } from './services/supabaseProgressService';
 
 // Inner App component that has access to auth context
 function AppContent() {
   const [currentPage, setCurrentPage] = useState('home'); // 'home', 'learning', 'auth', 'module1', 'module2', 'module3', 'module4', 'module5', 'module6', 'module7', 'module8', 'installation', 'task1', 'task2'
-  const [completedModules, setCompletedModules] = useState([]);
   
-  const { user, isAuthenticated, loading, signOut } = useAuth();
+  const { 
+    user, 
+    isAuthenticated, 
+    loading, 
+    signOut,
+    completedModules: authCompletedModules,
+    fetchUserData
+  } = useAuth();
 
-  // Helper function to convert module names to checkpoint IDs
-  const getModuleIdFromName = (moduleName) => {
-    const moduleMap = {
-      'module1': 0,
-      'module2': 1,
-      'task1': 2,
-      'installation': 3,
-      'module3': 4,
-      'task2': 5,
-      'module4': 6,
-      'module5': 7,
-      'module6': 8,
-      'module7': 9,
-      'module8': 10
-    };
-    return moduleMap[moduleName] !== undefined ? moduleMap[moduleName] : moduleName;
-  };
+  // Use completedModules from AuthContext or local state as fallback
+  const completedModules = authCompletedModules || [];
 
   // Helper function to convert checkpoint IDs to module names
   const getModuleNameFromId = (checkpointId) => {
@@ -68,51 +57,7 @@ function AppContent() {
     return idMap[checkpointId] || `module${checkpointId}`;
   };
 
-  // Function to load user's completed modules from Supabase
-  const loadUserProgress = useCallback(async () => {
-    // console.log("hello");
-    if (!user) return;
-
-    try {
-      console.log('Loading progress for user:', user.id);
-      const result = await SupabaseProgressService.getUserProgress(user.id);
-      
-      console.log('Progress result:', result);
-      
-      if (result.success && result.data) {
-        // Filter passed modules and convert module_id to checkpoint IDs
-        const completedModuleIds = result.data
-          .filter(p => {
-            console.log('Checking module:', p.module_id, 'passed:', p.passed);
-            return p.passed;
-          })
-          .map(p => {
-            // Convert module name to checkpoint ID
-            const checkpointId = getModuleIdFromName(p.module_id);
-            console.log('Converting:', p.module_id, '->', checkpointId);
-            return checkpointId;
-          });
-        
-        setCompletedModules(completedModuleIds);
-        console.log('Loaded user progress - completed modules:', completedModuleIds);
-      } else {
-        console.error('Failed to load progress:', result.error || result.message);
-        setCompletedModules([]);
-      }
-    } catch (error) {
-      console.error('Error loading user progress:', error);
-      setCompletedModules([]);
-    }
-  }, [user]);
-
-  // Load user progress when authenticated
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      loadUserProgress();
-    } else {
-      setCompletedModules([]);
-    }
-  }, [isAuthenticated, user, loadUserProgress]);
+  // Note: User progress is now loaded automatically by AuthContext when user signs in
 
   // Auto-redirect to learning path when user signs in while on auth page
   useEffect(() => {
@@ -176,10 +121,6 @@ function AppContent() {
 
   const completeModule = async (moduleNumber, score = null, totalQuestions = null) => {
     if (!completedModules.includes(moduleNumber)) {
-      // Update local state immediately
-      const newCompletedModules = [...completedModules, moduleNumber];
-      setCompletedModules(newCompletedModules);
-
       // Save to Supabase if user is authenticated and we have score data
       if (isAuthenticated && user && score !== null && totalQuestions !== null) {
         try {
@@ -207,9 +148,11 @@ function AppContent() {
           console.log(`Progress saved for ${moduleName}: ${score}/${totalQuestions}`);
           console.log(`Checkpoint ${moduleNumber} completed and saved`);
           
+          // Refresh user data from AuthContext to update completedModules
+          await fetchUserData(user);
+          
         } catch (error) {
           console.error('Error saving progress:', error);
-          // Note: We don't revert local state as the user did complete the module
         }
       }
       

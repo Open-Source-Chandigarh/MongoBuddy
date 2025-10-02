@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import BearMascot from './BearMascot';
 
 const LearningPath = ({ onModuleSelect, completedModules }) => {
+  // Use completedModules from props (which comes from AuthContext via App.jsx)
   const [completedCheckpoints, setCompletedCheckpoints] = useState(completedModules || []);
-  const [currentCheckpoint, setCurrentCheckpoint] = useState(() => {
-    // If no modules completed, start with checkpoint 0
-    // Otherwise, start with the next checkpoint after the last completed one
-    return completedModules?.length || 0;
-  });
+  
+  // Sync local state when completedModules prop changes
+  useEffect(() => {
+    setCompletedCheckpoints(completedModules || []);
+  }, [completedModules]);
+  
+  // Calculate current checkpoint based on completed modules
+  const currentCheckpoint = completedModules?.length || 0;
 
   // Function to check if a module is unlocked (accessible)
   const isModuleUnlocked = (checkpointId) => {
@@ -16,32 +20,6 @@ const LearningPath = ({ onModuleSelect, completedModules }) => {
     
     // Module is unlocked if the previous module is completed
     return completedCheckpoints.includes(checkpointId - 1);
-  };
-
-  // Function to mark a checkpoint as completed
-  const markCheckpointAsCompleted = (checkpointId) => {
-    if (!completedCheckpoints.includes(checkpointId)) {
-      const newCompletedCheckpoints = [...completedCheckpoints, checkpointId];
-      setCompletedCheckpoints(newCompletedCheckpoints);
-      
-      // Update current checkpoint to the next available one
-      const nextCheckpoint = Math.max(...newCompletedCheckpoints) + 1;
-      setCurrentCheckpoint(nextCheckpoint);
-    }
-  };
-
-  // Function to reset progress
-  const resetProgress = () => {
-    setCompletedCheckpoints([]);
-    setCurrentCheckpoint(0);
-  };
-
-  // Make functions available for future use (avoiding lint errors)
-  window.learningPathHelpers = {
-    markCheckpointAsCompleted,
-    resetProgress,
-    setCompletedCheckpoints,
-    setCurrentCheckpoint
   };
 
   const checkpoints = [
