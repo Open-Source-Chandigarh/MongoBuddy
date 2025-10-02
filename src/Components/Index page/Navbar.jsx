@@ -7,12 +7,16 @@ function Navbar({ user, onLogout, onGetStarted, onGoHome, onGoToModules }){
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <div className="flex items-center space-x-2">
+                <button 
+                  onClick={onGoHome}
+                  className="flex items-center space-x-2 hover:opacity-80 transition-opacity cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 rounded-lg p-1"
+                  aria-label="Go to home page"
+                >
                   <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
                     <BearMascot size="20px" />
                   </div>
                   <span className="text-xl font-bold text-gray-900">Mongo Buddy</span>
-                </div>
+                </button>
               </div>
             </div>
             <div className="hidden md:flex items-center space-x-8">
