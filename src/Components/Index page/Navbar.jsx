@@ -9,7 +9,7 @@ function Navbar({ user, onLogout, onGetStarted, onBackToHome, onGoToModules }){
               <div className="flex-shrink-0">
                 <button 
                   onClick={onBackToHome}
-                  className="flex items-center space-x-2 hover:opacity-80 transition-opacity cursor-pointer focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 rounded-lg p-1"
+                  className="flex items-center space-x-2 hover:opacity-80 transition-opacity cursor-pointer"
                   aria-label="Go to home page"
                 >
                   <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
