@@ -35,6 +35,13 @@ export default {
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
+      mongo: {
+        primary: '#00ED64',  // Spring Green
+        700: '#00684A',      // Deep Green
+        800: '#023430',      // Deeper Green
+        900: '#001E2B',      // Night Green
+        ivory: '#E8E7D5'     // Light neutral
+      }
     },
   },
   plugins: [],
