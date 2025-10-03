@@ -16,7 +16,8 @@ const Installation = ({ onBackToPath, onModuleComplete }) => {
   };
 
   const completeModule = () => {
-    onModuleComplete('installation', 100);
+    // Pass checkpoint ID (3 for Installation), score, and total questions
+    onModuleComplete(3, 1, 1);
     onBackToPath();
   };
 

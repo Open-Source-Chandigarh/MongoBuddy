@@ -1555,7 +1555,7 @@ db.users.find(
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
-                onClick={() => onModuleComplete('module8', 100)}
+                onClick={() => onModuleComplete(10, 10, 10)}
                 className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
               >
                 ✅ Complete Interview Prep

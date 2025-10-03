@@ -106,7 +106,8 @@ const Module3 = ({ onBackToPath, onModuleComplete }) => {
     setShowResults(true);
     
     if (onModuleComplete) {
-      onModuleComplete(3, finalScore);
+      // Pass checkpoint ID (4 for Module3 - CRUD Operations), score, and total questions
+      onModuleComplete(4, correctAnswers, questions.length);
     }
   };
 

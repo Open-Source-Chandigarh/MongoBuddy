@@ -201,6 +201,7 @@ const Module2 = ({ onBackToPath, onModuleComplete }) => {
     if (percentage >= 80) {
       // Pass checkpoint ID (1 for Module2), score, and total questions
       onModuleComplete(1, score, questions.length);
+      onBackToPath();
     } else {
       // Still go back to path even if not passed
       onBackToPath();

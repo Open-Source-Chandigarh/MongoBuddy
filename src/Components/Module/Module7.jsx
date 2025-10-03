@@ -252,7 +252,8 @@ const Module7 = ({ onBackToPath, onModuleComplete }) => {
   };
 
   const handleCompleteModule = () => {
-    onModuleComplete('module7', score);
+    // Pass checkpoint ID (9 for Module7 - Aggregation Pipeline), score, and total questions
+    onModuleComplete(9, score, questions.length);
   };
 
   const resetQuiz = () => {

@@ -486,7 +486,7 @@ db.students.find({ $text: { $search: "Computer Science" } })`,
                       </button>
                     ) : (
                       <button
-                        onClick={onModuleComplete}
+                        onClick={() => onModuleComplete(6, 10, 10)}
                         className="flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                       >
                         Complete Module

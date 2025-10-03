@@ -10,15 +10,7 @@ const Module6 = ({ onBackToPath, onModuleComplete }) => {
   const [showResults, setShowResults] = useState(false);
   const [score, setScore] = useState(0);
   const [showTheory, setShowTheory] = useState(true); // Start with theory
-  const [startTime, setStartTime] = useState(null);
-  const [saving, setSaving] = useState(false);
-  
-  const { user, isAuthenticated } = useAuth();
 
-  // Start tracking time when component mounts
-  useEffect(() => {
-    setStartTime(Date.now());
-  }, []);
 
   // Quiz questions based on MongoDB Indexing
   const questions = [
@@ -313,39 +305,9 @@ db.articles.insertMany([
     }
   };
 
-  const handleCompleteModule = async () => {
-    if (!isAuthenticated || !user) {
-      alert('Please log in to save your progress');
-      onModuleComplete('module6', score);
-      return;
-    }
-
-    setSaving(true);
-    
-    try {
-      const result = await SupabaseProgressService.saveModuleProgress({
-        userId: user.id,
-        email: user.email,
-        moduleId: 'module6',
-        score: score,
-        totalQuestions: questions.length,
-        startTime: startTime
-      });
-
-      if (result.success) {
-        alert('Progress saved successfully! 🎉');
-      } else {
-        console.error('Failed to save progress:', result.error);
-        alert('Failed to save progress. Please try again.');
-      }
-    } catch (error) {
-      console.error('Error saving progress:', error);
-      alert('An error occurred while saving progress.');
-    } finally {
-      setSaving(false);
-    }
-    
-    onModuleComplete('module6', score);
+  const handleCompleteModule = () => {
+    // Pass checkpoint ID (8 for Module6 - Indexing), score, and total questions
+    onModuleComplete(8, score, questions.length);
   };
 
   const resetQuiz = () => {
@@ -548,14 +510,9 @@ db.articles.insertMany([
                 {passed && (
                   <button
                     onClick={handleCompleteModule}
-                    disabled={saving}
-                    className={`px-6 py-3 rounded-lg transition-colors ${
-                      saving 
-                        ? 'bg-gray-400 text-gray-600 cursor-not-allowed' 
-                        : 'bg-blue-600 text-white hover:bg-blue-700'
-                    }`}
+                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                   >
-                    {saving ? '💾 Saving Progress...' : '✅ Complete Module'}
+                    ✅ Complete Module
                   </button>
                 )}
                 
