@@ -57,9 +57,7 @@ const EnhancedHero = ({ onStartLearning }) => {
             </div>
 
             <p className="text-xl text-gray-600 mb-10 leading-relaxed">
-              Embark on an epic journey to master MongoDB through gamified lessons, 
-              interactive challenges, and hands-on projects. Learn database concepts 
-              the fun way with our friendly bear guide!
+              Master MongoDB the fun way—gamified lessons, hands-on challenges, and your friendly bear guide!
             </p>
 
             {/* CTA Buttons */}
