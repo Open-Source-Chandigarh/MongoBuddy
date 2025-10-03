@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import Features from "./Components/Index page/Features"
 import Footer from "./Components/Index page/Footer"
 import Navbar from "./Components/Index page/Navbar"
@@ -23,9 +24,23 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import AuthForm from '@/Components/Auth/AuthForm';
 import { SupabaseProgressService } from './services/supabaseProgressService';
 
-// Inner App component that has access to auth context
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+  
+  return isAuthenticated ? children : <Navigate to="/auth" replace />;
+};
+
 function AppContent() {
-  const [currentPage, setCurrentPage] = useState('home'); // 'home', 'learning', 'auth', 'module1', 'module2', 'module3', 'module4', 'module5', 'module6', 'module7', 'module8', 'installation', 'task1', 'task2'
+  const navigate = useNavigate();
+  const location = useLocation();
   
   const { 
     user, 
@@ -36,10 +51,8 @@ function AppContent() {
     fetchUserData
   } = useAuth();
 
-  // Use completedModules from AuthContext or local state as fallback
   const completedModules = authCompletedModules || [];
 
-  // Helper function to convert checkpoint IDs to module names
   const getModuleNameFromId = (checkpointId) => {
     const idMap = {
       0: 'module1',
@@ -57,86 +70,67 @@ function AppContent() {
     return idMap[checkpointId] || `module${checkpointId}`;
   };
 
-  // Note: User progress is now loaded automatically by AuthContext when user signs in
-
-  // Auto-redirect to learning path when user signs in while on auth page
   useEffect(() => {
     console.log('Auth state changed:', { 
       isAuthenticated, 
-      currentPage, 
+      currentPath: location.pathname,
       userEmail: user?.email,
       loading 
     });
     
-    // Only redirect if we're not loading and user is authenticated and on auth page
-    if (!loading && isAuthenticated && currentPage === 'auth') {
+    if (!loading && isAuthenticated && location.pathname === '/auth') {
       console.log('Redirecting to learning path...');
-      // Use a small delay to ensure state has fully updated
       setTimeout(() => {
-        setCurrentPage('learning');
+        navigate('/learning');
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }, 100);
     }
-  }, [isAuthenticated, currentPage, loading, user]);
+  }, [isAuthenticated, location.pathname, loading, user, navigate]);
 
   const handleStartLearning = () => {
     if (isAuthenticated) {
-      setCurrentPage('learning');
+      navigate('/learning');
     } else {
-      setCurrentPage('auth');
+      navigate('/auth');
     }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleBackToHome = () => {
-    setCurrentPage('home');
+    navigate('/');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleGoToModules = () => {
     if (isAuthenticated) {
-      setCurrentPage('learning');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      navigate('/learning');
     } else {
-      setCurrentPage('auth');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      navigate('/auth');
     }
-  };
-
-  const handleLogin = () => {
-    setCurrentPage('learning');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleSignup = () => {
-    setCurrentPage('learning');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleLogout = () => {
     signOut();
-    setCurrentPage('home');
+    navigate('/');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const completeModule = async (moduleNumber, score = null, totalQuestions = null) => {
     if (!completedModules.includes(moduleNumber)) {
-      // Save to Supabase if user is authenticated and we have score data
       if (isAuthenticated && user && score !== null && totalQuestions !== null) {
         try {
           const moduleName = getModuleNameFromId(moduleNumber);
           
-          // Save module progress
           await SupabaseProgressService.saveModuleProgress({
             userId: user.id,
             email: user.email,
             moduleId: moduleName,
             score: score,
             totalQuestions: totalQuestions,
-            timeSpent: 0 // Will be calculated by service if startTime provided
+            timeSpent: 0
           });
           
-          // Save checkpoint completion
           await SupabaseProgressService.saveCheckpointCompletion({
             userId: user.id,
             email: user.email,
@@ -146,9 +140,6 @@ function AppContent() {
           });
           
           console.log(`Progress saved for ${moduleName}: ${score}/${totalQuestions}`);
-          console.log(`Checkpoint ${moduleNumber} completed and saved`);
-          
-          // Refresh user data from AuthContext to update completedModules
           await fetchUserData(user);
           
         } catch (error) {
@@ -156,120 +147,241 @@ function AppContent() {
         }
       }
       
-      // Auto-redirect to learning path after completion
       setTimeout(() => {
-        setCurrentPage('learning');
+        navigate('/learning');
         window.scrollTo({ top: 0, behavior: 'smooth' });
-      }, 1000); // Small delay to show completion message
+      }, 1000);
     }
   };
 
+  const hideNavAndFooter = [
+    '/module1', '/module2', '/module3', '/module4', 
+    '/module5', '/module6', '/module7', '/module8',
+    '/installation', '/task1', '/task2'
+  ].includes(location.pathname);
+
   return (
     <div className="App bg-gray-50">
-      {/* Navigation */}
-      {currentPage !== 'module1' && currentPage !== 'module2' && currentPage !== 'module3' && currentPage !== 'module4' && currentPage !== 'module5' && currentPage !== 'module6' && currentPage !== 'module7' && currentPage !== 'module8' && currentPage !== 'installation' && currentPage !== 'task1' && currentPage !== 'task2' && <Navbar 
-        currentPage={currentPage} 
-        onBackToHome={handleBackToHome}
-        onGoToModules={handleGoToModules}
-        onGetStarted={handleStartLearning}
-        onBackToPath={handleGoToModules}
-        onLogin={() => setCurrentPage('auth')}
-        onLogout={handleLogout}
-        isAuthenticated={isAuthenticated}
-        user={user}
-      />}
-
-      {/* Page Rendering */}
-      {currentPage === 'home' && (
-        <Home onStartLearning={handleStartLearning} />
+      {!hideNavAndFooter && (
+        <Navbar 
+          currentPage={location.pathname}
+          onBackToHome={handleBackToHome}
+          onGoToModules={handleGoToModules}
+          onGetStarted={handleStartLearning}
+          onBackToPath={handleGoToModules}
+          onLogin={() => navigate('/auth')}
+          onLogout={handleLogout}
+          isAuthenticated={isAuthenticated}
+          user={user}
+        />
       )}
 
-      {currentPage === 'auth' && (
-        <AuthForm onAuthSuccess={() => {
-          console.log('onAuthSuccess callback triggered');
-          setCurrentPage('learning');
-        }} />
-      )}
-
-      {currentPage === 'learning' && (
-        <div>
-          {/* Check authentication before showing learning path */}
-          {!isAuthenticated ? (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
-              <div className="text-center bg-white p-8 rounded-xl shadow-lg">
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">Please Sign In</h2>
-                <p className="text-gray-600 mb-6">You need to sign in to access the learning path.</p>
-                <button 
-                  onClick={() => setCurrentPage('auth')}
-                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Sign In
-                </button>
-              </div>
-            </div>
-          ) : (
-            <LearningPath 
-              onModuleSelect={(module) => setCurrentPage(module)} 
-              completedModules={completedModules}
+      <Routes>
+        <Route path="/" element={<Home onStartLearning={handleStartLearning} />} />
+        <Route 
+          path="/auth" 
+          element={
+            <AuthForm onAuthSuccess={() => {
+              console.log('onAuthSuccess callback triggered');
+              navigate('/learning');
+            }} />
+          } 
+        />
+        <Route 
+          path="/login" 
+          element={
+            <Login 
+              onLogin={() => navigate('/learning')}
               onBackToHome={handleBackToHome}
-              user={user}
-              onLogout={handleLogout}
+              onSwitchToSignup={() => navigate('/signup')}
             />
-          )}
-        </div>
-      )}
-
-      {currentPage === 'login' && (
-        <Login 
-          onLogin={handleLogin}
-          onBackToHome={handleBackToHome}
-          onSwitchToSignup={() => setCurrentPage('signup')}
+          } 
         />
-      )}
-
-      {currentPage === 'signup' && (
-        <Signup 
-          onSignup={handleSignup}
-          onBackToHome={handleBackToHome}
-          onSwitchToLogin={() => setCurrentPage('login')}
+        <Route 
+          path="/signup" 
+          element={
+            <Signup 
+              onSignup={() => navigate('/learning')}
+              onBackToHome={handleBackToHome}
+              onSwitchToLogin={() => navigate('/login')}
+            />
+          } 
         />
-      )}
 
-      {/* Module Pages */}
-      {currentPage === 'module1' && <Module1 onModuleComplete={(moduleNumber, score, totalQuestions) => completeModule(moduleNumber || 0, score, totalQuestions)} onBackToPath={() => setCurrentPage('learning')} />}
-      {currentPage === 'module2' && <Module2 onModuleComplete={(moduleNumber, score, totalQuestions) => completeModule(moduleNumber || 1, score, totalQuestions)} onBackToPath={() => setCurrentPage('learning')} />}
-      {currentPage === 'module3' && <Module3 onModuleComplete={(moduleNumber, score, totalQuestions) => completeModule(moduleNumber || 4, score, totalQuestions)} onBackToPath={() => setCurrentPage('learning')} />}
-      {currentPage === 'module4' && <Module4 onModuleComplete={(moduleNumber, score, totalQuestions) => completeModule(moduleNumber || 6, score, totalQuestions)} onBackToPath={() => setCurrentPage('learning')} />}
-      {currentPage === 'module5' && <Module5 onModuleComplete={(moduleNumber, score, totalQuestions) => completeModule(moduleNumber || 7, score, totalQuestions)} onBackToPath={() => setCurrentPage('learning')} />}
-      {currentPage === 'module6' && <Module6 onModuleComplete={(moduleNumber, score, totalQuestions) => completeModule(moduleNumber || 8, score, totalQuestions)} onBackToPath={() => setCurrentPage('learning')} />}
-      {currentPage === 'module7' && <Module7 onModuleComplete={(moduleNumber, score, totalQuestions) => completeModule(moduleNumber || 9, score, totalQuestions)} onBackToPath={() => setCurrentPage('learning')} />}
-      {currentPage === 'module8' && <Module8 onModuleComplete={(moduleNumber, score, totalQuestions) => completeModule(moduleNumber || 10, score, totalQuestions)} onBackToPath={() => setCurrentPage('learning')} />}
-      {currentPage === 'installation' && <Installation onComplete={() => completeModule('installation')} onBackToLearning={() => setCurrentPage('learning')} />}
-      {currentPage === 'task1' && <Task1 onComplete={() => completeModule('task1')} onBackToLearning={() => setCurrentPage('learning')} />}
-      {currentPage === 'task2' && <Taskk2 onComplete={() => completeModule('task2')} onBackToLearning={() => setCurrentPage('learning')} />}
+        <Route 
+          path="/learning" 
+          element={
+            <ProtectedRoute>
+              <LearningPath 
+                onModuleSelect={(module) => navigate(`/${module}`)} 
+                completedModules={completedModules}
+                onBackToHome={handleBackToHome}
+                user={user}
+                onLogout={handleLogout}
+              />
+            </ProtectedRoute>
+          } 
+        />
 
-      {/* Footer - Hide on auth pages and modules */}
-      {currentPage !== 'auth' && currentPage !== 'module1' && currentPage !== 'module2' && currentPage !== 'module3' && currentPage !== 'module4' && currentPage !== 'module5' && currentPage !== 'module6' && currentPage !== 'module7' && currentPage !== 'module8' && currentPage !== 'installation' && currentPage !== 'task1' && currentPage !== 'task2' && <Footer />}
+        <Route 
+          path="/module1" 
+          element={
+            <ProtectedRoute>
+              <Module1 
+                onModuleComplete={(moduleNumber, score, totalQuestions) => 
+                  completeModule(moduleNumber || 0, score, totalQuestions)
+                } 
+                onBackToPath={() => navigate('/learning')} 
+              />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/module2" 
+          element={
+            <ProtectedRoute>
+              <Module2 
+                onModuleComplete={(moduleNumber, score, totalQuestions) => 
+                  completeModule(moduleNumber || 1, score, totalQuestions)
+                } 
+                onBackToPath={() => navigate('/learning')} 
+              />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/module3" 
+          element={
+            <ProtectedRoute>
+              <Module3 
+                onModuleComplete={(moduleNumber, score, totalQuestions) => 
+                  completeModule(moduleNumber || 4, score, totalQuestions)
+                } 
+                onBackToPath={() => navigate('/learning')} 
+              />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/module4" 
+          element={
+            <ProtectedRoute>
+              <Module4 
+                onModuleComplete={(moduleNumber, score, totalQuestions) => 
+                  completeModule(moduleNumber || 6, score, totalQuestions)
+                } 
+                onBackToPath={() => navigate('/learning')} 
+              />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/module5" 
+          element={
+            <ProtectedRoute>
+              <Module5 
+                onModuleComplete={(moduleNumber, score, totalQuestions) => 
+                  completeModule(moduleNumber || 7, score, totalQuestions)
+                } 
+                onBackToPath={() => navigate('/learning')} 
+              />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/module6" 
+          element={
+            <ProtectedRoute>
+              <Module6 
+                onModuleComplete={(moduleNumber, score, totalQuestions) => 
+                  completeModule(moduleNumber || 8, score, totalQuestions)
+                } 
+                onBackToPath={() => navigate('/learning')} 
+              />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/module7" 
+          element={
+            <ProtectedRoute>
+              <Module7 
+                onModuleComplete={(moduleNumber, score, totalQuestions) => 
+                  completeModule(moduleNumber || 9, score, totalQuestions)
+                } 
+                onBackToPath={() => navigate('/learning')} 
+              />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/module8" 
+          element={
+            <ProtectedRoute>
+              <Module8 
+                onModuleComplete={(moduleNumber, score, totalQuestions) => 
+                  completeModule(moduleNumber || 10, score, totalQuestions)
+                } 
+                onBackToPath={() => navigate('/learning')} 
+              />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/installation" 
+          element={
+            <ProtectedRoute>
+              <Installation 
+                onComplete={() => completeModule('installation')} 
+                onBackToLearning={() => navigate('/learning')} 
+              />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/task1" 
+          element={
+            <ProtectedRoute>
+              <Task1 
+                onComplete={() => completeModule('task1')} 
+                onBackToLearning={() => navigate('/learning')} 
+              />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/task2" 
+          element={
+            <ProtectedRoute>
+              <Taskk2 
+                onComplete={() => completeModule('task2')} 
+                onBackToLearning={() => navigate('/learning')} 
+              />
+            </ProtectedRoute>
+          } 
+        />
 
-      {/* Floating Bear Mascot - Hide on auth pages and modules */}
-      {currentPage !== 'auth' && currentPage !== 'module1' && currentPage !== 'module2' && currentPage !== 'module3' && currentPage !== 'module4' && currentPage !== 'module5' && currentPage !== 'module6' && currentPage !== 'module7' && currentPage !== 'module8' && currentPage !== 'installation' && currentPage !== 'task1' && currentPage !== 'task2' && (
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+
+      {!hideNavAndFooter && <Footer />}
+
+      {!hideNavAndFooter && (
         <div className="fixed bottom-4 right-4 z-50">
-          {/* <BearMascot size="80px" /> */}
-          {/* <FloatingBear></FloatingBear> */}
+          <BearMascot size="80px" />
+          <FloatingBear></FloatingBear>
         </div>
       )}
-      
-      {/* Auth Debug Component */}
-      {/* <AuthDebug /> */}
     </div>
   );
 }
 
-// Main App wrapper with AuthProvider
 function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <Router>
+        <AppContent />
+      </Router>
     </AuthProvider>
   );
 }

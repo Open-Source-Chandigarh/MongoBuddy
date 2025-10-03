@@ -72,14 +72,12 @@ Environment Variables - Copy the example file and fill in values:
 ```
 cp .env.example .env
 ```
-Edit .env with appropriate values:
+Edit `.env` with appropriate values:
 
-text
 
-```
-MONGODB_URI="mongodb://localhost:27017/mongobuddy"   # or your MongoDB Atlas URI
-PORT=3000
-SESSION_SECRET="change-this-to-a-strong-secret"
+```text
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
 If using Atlas:
