@@ -36,7 +36,7 @@ function Navbar({ user, onLogout, onGetStarted, onBackToHome, onGoToModules }){
               {user ? (
                 <div className="flex items-center space-x-4">
                   <span className="text-gray-700 text-sm">
-                    Welcome, <span className="font-medium">{user.email?.split('@')[0] || user.email}</span>!
+                    Welcome, <span className="font-medium">{user.user_metadata.full_name}</span>!
                   </span>
                   <button 
                     onClick={onLogout}
