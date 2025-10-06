@@ -24,29 +24,29 @@ function Footer(){
           <div>
             <h4 className="font-semibold mb-4 text-white">Quick Links</h4>
             <ul className="space-y-2 text-emerald-100/80">
+              <li><a href="#" className="hover:text-white transition-colors">Home</a></li>
               <li><a href="#" className="hover:text-white transition-colors">Learning Modules</a></li>
               <li><a href="#" className="hover:text-white transition-colors">Leaderboard</a></li>
               <li><a href="#" className="hover:text-white transition-colors">My Profile</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
+              <li><a href="https://help.center/" target="blank" className="hover:text-white transition-colors">Help Center</a></li>
             </ul>
           </div>
 
           <div>
             <h4 className="font-semibold mb-4 text-white">Community</h4>
             <ul className="space-y-2 text-emerald-100/80">
-              <li><a href="#" className="hover:text-white transition-colors">Discord</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Forum</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Events</a></li>
+              <li><a href="https://discord.com/" target='blank' className="hover:text-white transition-colors">Discord</a></li>
+              
+              <li><a href="https://www.blogger.com/about/?bpli=1" target='blank' className="hover:text-white transition-colors">Blog</a></li>
             </ul>
           </div>
 
           <div>
             <h4 className="font-semibold mb-4 text-white">Connect</h4>
             <div className="flex space-x-4 text-emerald-100/80">
-              <a href="#" className="hover:text-white transition-colors">Twitter</a>
-              <a href="#" className="hover:text-white transition-colors">GitHub</a>
-              <a href="#" className="hover:text-white transition-colors">LinkedIn</a>
+              <a href="https://x.com/home?lang=en" target='blank' className="hover:text-white transition-colors">Twitter</a>
+              <a href="https://github.com/Open-Source-Chandigarh/MongoBuddy" target='blank' className="hover:text-white transition-colors">GitHub</a>
+              <a href="https://in.linkedin.com/" target='blank' className="hover:text-white transition-colors">LinkedIn</a>
             </div>
           </div>
         </div>
